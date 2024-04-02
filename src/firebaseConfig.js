@@ -1,11 +1,23 @@
-// const { initializeApp, cert } = require('firebase-admin/app');
-// const { getFirestore } = require('firebase-admin/firestore');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 
-// const serviceAccount = require('./firebaseCredentials.json');
-// initializeApp({
-// 	credential: cert(serviceAccount)
-// });
+const serviceAccount = require('./personal-organizer_firebaseCredentials.json');
+initializeApp({
+	credential: cert(serviceAccount)
+});
 
-// const db = getFirestore();
+const db = getFirestore();
 
-// module.exports = { db };
+async function testing() {
+	const docRef = db.collection('users').doc('alovelace');
+	
+	await docRef.set({
+		first: 'Ada',
+		last: 'Lovelace',
+		born: 1815
+	});
+}
+
+testing();
+
+module.exports = { db };
