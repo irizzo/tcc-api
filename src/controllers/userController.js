@@ -12,24 +12,16 @@ const { emailValidation, passwordValidation } = require('../resources/validation
 	}
 */
 
-// async function isEmailUnique(userEmail) {
-// 	let unique;
+async function isEmailUnique(userEmail) {
+	const match = await userModel.getUserByEmail(userEmail);
 
-// 	const usersList = await userModel.getAllDbUsers();
-	
-// 	const emailsList = usersList.map((user) => {
-// 		return user?.email;
-// 	});
+	if (match.length > 0) {
+		console.log('email is not unique');
+		return false
+	}
 
-// 	console.log(`emailsList = ${JSON.stringify(emailsList)}`);
-
-// 	const match = emailsList.map((email, index) => {
-// 		if(email === userEmail) {
-
-// 			return index
-// 		}
-// 	});
-// }
+	return true
+}
 
 async function createUser(req, res) {
 	try {
@@ -82,16 +74,17 @@ async function createUser(req, res) {
 		}
 
 		// email must be unique
-		// if(!isEmailUnique(cleanUser.email)) {
-		// 	res.status(400).send({
-		// 		code: 'EMAIL_NOT_UNIQUE',
-		// 		result: null,
-		// 		success: false
-		// 	});
+		const uniqueEmail = await isEmailUnique(cleanUser.email);
 
-		// 	return;
-		// }
+		if(!uniqueEmail) {
+			res.status(400).send({
+				code: 'EMAIL_NOT_UNIQUE',
+				result: null,
+				success: false
+			});
 
+			return;
+		}
 
 		cleanUser.password = encrypt(password);
 

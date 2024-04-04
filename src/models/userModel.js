@@ -12,11 +12,12 @@ async function createDbUser(user) {
 }
 
 async function getAllDbUsers() {
-	console.log('[getAllDbUsers]');;
+	console.log('[getAllDbUsers]');
 
 	const usersList = [];
 
 	const snapshot = await usersCollectionRef.get();
+
 	snapshot.forEach(doc => {
 		usersList.push({
 			id: doc.id,
@@ -27,7 +28,26 @@ async function getAllDbUsers() {
 	return usersList;
 }
 
+async function getUserByEmail(email) {
+	console.log('[getUserByEmail]');
+
+	const snapshot = await usersCollectionRef.where('email', '==', email).get();
+	const matchList = [];
+
+	if (snapshot.empty) {
+		console.log('No email matches found');
+		return matchList;
+	}
+
+	snapshot.forEach(doc => {
+		matchList.push(doc.id);
+	});
+
+	return matchList;
+}
+
 module.exports = {
 	createDbUser,
-	getAllDbUsers
+	getAllDbUsers,
+	getUserByEmail
 };
