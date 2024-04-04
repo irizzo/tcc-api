@@ -30,8 +30,17 @@ function titleValidation(title) {
 	return true;
 }
 
+function passwordValidation(password) {
+	if (!password || password.length < 8) {
+		return false;
+	}
+
+	return true;
+}
+
 module.exports = {
 	dueDateValidation,
 	emailValidation,
-	titleValidation
+	titleValidation,
+	passwordValidation
 };

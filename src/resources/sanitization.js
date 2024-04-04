@@ -9,7 +9,7 @@ function sanitizeString(sourceString) {
 function sanitizeEmail(sourceEmail) {
 	// console.log(`[sanitizeEmail] sourceEmail = ${sourceEmail}`);
 
-	const cleanEmail = sourceEmail.trim().replace(/[`~!#$%^&*()|\-=?;:'",<>\{\}\[\]\\\/]/gi, '');
+	const cleanEmail = sourceEmail.trim().replace(/[`~!#$%^&*()|=?;:'",<>\{\}\[\]\\\/]/gi, '');
 	return cleanEmail;
 }
 
