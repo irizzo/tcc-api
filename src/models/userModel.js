@@ -5,7 +5,7 @@ const usersCollectionRef = db.collection('users');
 async function createDbUser(user) {
 	console.log('[createDbUser]');
 
-	const userRef = await usersCollectionRef.add(user);
+	const userRef = await usersCollectionRef.add({ ...user, tasks: [], events: [], routines: [] }); // TODO: test if the fields are created on DB
 	const createdUserId = userRef.id;
 
 	return createdUserId;
@@ -28,19 +28,22 @@ async function getAllDbUsers() {
 	return usersList;
 }
 
-async function getUserByEmail(email) {
-	console.log('[getUserByEmail]');
+async function findUserByEmail(email) {
+	console.log('[findUserByEmail]');
 
 	const snapshot = await usersCollectionRef.where('email', '==', email).get();
 	const matchList = [];
 
 	if (snapshot.empty) {
 		console.log('No email matches found');
-		return matchList;
+		return [];
 	}
 
 	snapshot.forEach(doc => {
-		matchList.push(doc.id);
+		matchList.push({
+			id: doc.id,
+			...doc.data()
+		});
 	});
 
 	return matchList;
@@ -49,5 +52,5 @@ async function getUserByEmail(email) {
 module.exports = {
 	createDbUser,
 	getAllDbUsers,
-	getUserByEmail
+	findUserByEmail
 };

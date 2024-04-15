@@ -7,6 +7,9 @@ function encrypt(s) {
 }
 
 function compare(s, encripted) {
+	console.log(`s = ${s}`);
+	console.log(`encripted = ${encripted}`);
+	
 	return bcrypt.compareSync(s, encripted);
 }
 

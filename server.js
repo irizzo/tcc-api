@@ -18,7 +18,9 @@ app.get('/', (req, res) => {
 	res.send('Hello World!');
 });
 
-app.post('/create-user', userController.createUser)
+// user routes
+app.post('/create-user', userController.createUser);
+app.post('/login', userController.login);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);

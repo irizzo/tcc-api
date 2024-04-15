@@ -1,26 +1,14 @@
 const userModel = require('../models/userModel');
-const { encrypt } = require('../resources/cryptography'); 
+
+// resources
+const { encrypt, compare } = require('../resources/cryptography'); 
 const { sanitizeString, sanitizeEmail } = require('../resources/sanitization');
 const { emailValidation, passwordValidation } = require('../resources/validations');
 
-/* mock user
-	{	
-		firstName: "Firstname",
-		lastName: "Lastname",
-		email: "firstlast@gmail.com",
-		password: "firstlast"
-	}
-*/
+async function getUserByEmail(userEmail) {
+	const matchList = await userModel.findUserByEmail(userEmail);
 
-async function isEmailUnique(userEmail) {
-	const match = await userModel.getUserByEmail(userEmail);
-
-	if (match.length > 0) {
-		console.log('email is not unique');
-		return false
-	}
-
-	return true
+	return matchList;
 }
 
 async function createUser(req, res) {
@@ -29,7 +17,7 @@ async function createUser(req, res) {
 
 		const { firstName, lastName, email, password } =  req.body;
 	
-		// sanitation 
+		// sanitization 
 		let cleanUser = {
 			firstName: '',
 			lastName: '',
@@ -53,15 +41,15 @@ async function createUser(req, res) {
 			return;
 		};
 
-		if(!passwordValidation(cleanUser.password)) {
-			res.status(400).send({
-				code: 'INVALID_PASSWORD',
-				result: null,
-				success: false
-			});
+		// if(!passwordValidation(cleanUser.password)) {
+		// 	res.status(400).send({
+		// 		code: 'INVALID_PASSWORD',
+		// 		result: null,
+		// 		success: false
+		// 	});
 			
-			return;
-		}
+		// 	return;
+		// }
 
 		if (!emailValidation(cleanUser.email)) {
 			res.status(400).send({
@@ -74,9 +62,9 @@ async function createUser(req, res) {
 		}
 
 		// email must be unique
-		const uniqueEmail = await isEmailUnique(cleanUser.email);
+		const emailMatchList = await getUserByEmail(cleanUser.email);
 
-		if(!uniqueEmail) {
+		if(emailMatchList.length < 0) {
 			res.status(400).send({
 				code: 'EMAIL_NOT_UNIQUE',
 				result: null,
@@ -110,8 +98,82 @@ async function createUser(req, res) {
 	}
 }
 
-async function logInUser(req, res) {
+async function login(req, res) {
 	try {
+		console.log('[logInUser]');
+
+		const { email, password } = req.body;
+
+		// sanitization 
+		const cleanLogInInfo = {
+			email: '',
+			password: ''
+		}
+
+		cleanLogInInfo.password = sanitizeString(password);
+		cleanLogInInfo.email = sanitizeEmail(email);
+
+		// validations
+		if (!cleanLogInInfo.email || !cleanLogInInfo.password) {
+			res.status(400).send({
+				code: 'EMPTY_FIELD',
+				result: null,
+				success: false
+			});
+
+			return;
+		};
+
+		// if (!passwordValidation(cleanLogInInfo.password)) {
+		// 	res.status(400).send({
+		// 		code: 'INVALID_PASSWORD',
+		// 		result: null,
+		// 		success: false
+		// 	});
+
+		// 	return;
+		// }
+
+		if (!emailValidation(cleanLogInInfo.email)) {
+			res.status(400).send({
+				code: 'INVALID_EMAIL',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+
+		const emailMatchList = await getUserByEmail(cleanLogInInfo.email);
+		if (emailMatchList.length === 0) {
+			res.status(400).send({
+				code: 'EMAIL_NOT_REGISTERED',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+
+		console.log(`emailMatchList = ${JSON.stringify(emailMatchList)}`);
+
+		if (!compare(cleanLogInInfo.password, emailMatchList[0].password)) {
+			res.status(400).send({
+				code: 'INCORRECT_PASSWORD',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+
+		// Log in user
+
+		res.status(200).send({
+			code: 'USER_LOGGED_IN',
+			result: null,
+			success: true
+		});
 		
 	} catch (error) {
 		console.log(`ERROR: ${error}`);
@@ -125,5 +187,5 @@ async function logInUser(req, res) {
 
 module.exports = {
 	createUser,
-	logInUser
+	login
 }

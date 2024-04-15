@@ -31,16 +31,20 @@ function titleValidation(title) {
 }
 
 function passwordValidation(password) {
-	if (!password) {
+	if (!password || password === "" || password.length === 0) {
+		console.log(`!password || password === "" || password.length === 0`);
 		return false;
 	}
 
-	const passPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.* [\W])(?!.*\s){8,}$/
+	const passPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.* [\W])(?!.*\s){8,}$/;
 	/* pelo menos 8 caracteres; pelo menos 1 número (0-9); pelo menos 1 letra minúscula; pelo menos 1 letra maiúscula; pelo menos 1 caractere especial; não pode ter espaços em branco */
 
 	if(!passPattern.test(password)) {
+		console.log(`!passPattern.test(password)`);
 		return false;
 	}
+
+	console.log('valid pass');
 
 	return true;
 }
