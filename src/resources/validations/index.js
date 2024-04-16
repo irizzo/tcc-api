@@ -49,9 +49,27 @@ function passwordValidation(password) {
 	return true;
 }
 
+// TODO: priorityCodeValidation
+function priorityCodeValidation(priorityCode) {
+	return true;
+}
+
+// TODO: categoryCodeValidation
+function categoryCodeValidation(categoryCode) {
+	return true;
+}
+
+// TODO: statusCodeValidation
+function statusCodeValidation(statusCode) {
+	return true;
+}
+
 module.exports = {
 	dueDateValidation,
 	emailValidation,
 	titleValidation,
-	passwordValidation
+	passwordValidation,
+	priorityCodeValidation,
+	categoryCodeValidation,
+	statusCodeValidation
 };

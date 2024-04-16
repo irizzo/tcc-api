@@ -6,6 +6,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const userController = require('./src/controllers/userController.js');
+const taskController = require('./src/controllers/taskController.js');
 
 const app = express();
 const port = 8080;
@@ -21,6 +22,8 @@ app.get('/', (req, res) => {
 // user routes
 app.post('/create-user', userController.createUser);
 app.post('/login', userController.login);
+
+app.post('create-task', taskController.createTask);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
