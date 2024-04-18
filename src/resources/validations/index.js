@@ -1,6 +1,9 @@
 function dueDateValidation(date) {
 	const today = new Date();
 
+	console.log(`today = ${today} type ${typeof (today)} str ${JSON.stringify(today)}`);
+	console.log(`date = ${date} type ${typeof (date)} str ${JSON.stringify(date)}`);
+
 	if (today > date) {
 		return false;
 	}

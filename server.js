@@ -23,7 +23,8 @@ app.get('/', (req, res) => {
 app.post('/create-user', userController.createUser);
 app.post('/login', userController.login);
 
-app.post('create-task', taskController.createTask);
+// task routes
+app.post('/create-task', taskController.createTask);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);

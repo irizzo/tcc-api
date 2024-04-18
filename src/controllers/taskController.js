@@ -4,9 +4,13 @@ const taskModel = require('../models/taskModel');
 const { dueDateValidation, titleValidation, categoryCodeValidation, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
 const { sanitizeString } = require('../resources/sanitization');
 
+// TODO: get from bd
 const categories = [];
 const priorities = [];
 const status = [];
+
+// get from session
+const userId = 'Qja9BA2MbDAg0IO2MVj3';
 
 async function createTask(req, res) {
 	try {
@@ -14,12 +18,10 @@ async function createTask(req, res) {
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 
-		// get user session
-		const { userId } = req.session;
-
+		// TODO: get user session
 		// validate user session
-
-		// if user session is not valid, redirect to log in
+		// if user session is not valid, redirect to log in]
+		// if session is valid, get userId
 
 		// sanitization
 		let cleanTask = {
@@ -37,9 +39,9 @@ async function createTask(req, res) {
 		if (description.lenght > 0) {
 			cleanTask.description = sanitizeString(description);
 		};
-
-		cleanTask.dueDate = dueDate; // TODO: sanitize date
-		cleanTask.toDoDate = toDoDate; // TODO: sanitize date
+	
+		cleanTask.dueDate = new Date(dueDate); // TODO: handle date https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+		cleanTask.toDoDate = new Date(toDoDate); // TODO: handle date
 		cleanTask.categoryCode = sanitizeString(categoryCode);
 		cleanTask.priorityCode = sanitizeString(priorityCode); 
 
@@ -54,7 +56,7 @@ async function createTask(req, res) {
 			return;
 		}
 
-		if (!dueDateValidation(cleanTodo.dueDate)) {
+		if (!dueDateValidation(cleanTask.dueDate)) {
 			res.status(400).send({
 				code: 'INVALID_DUE_DATE',
 				result: null,
@@ -64,7 +66,7 @@ async function createTask(req, res) {
 			return;
 		}
 
-		if (!dueDateValidation(cleanTodo.toDoDate)) {
+		if (!dueDateValidation(cleanTask.toDoDate)) {
 			res.status(400).send({
 				code: 'INVALID_DUE_DATE',
 				result: null,
@@ -105,13 +107,15 @@ async function createTask(req, res) {
 		}
 
 		// create task (DB)
-		const createdTask = await todoModel.createDbTask(cleanTask);
+		const createdTask = await taskModel.createDbTask(cleanTask, userId);
 
 		console.log(`[createTask] createdTask = ${JSON.stringify(createdTask)}`);
 
+		console.log(`taskInfo = ${JSON.stringify(cleanTask)}`);
+
 		res.status(200).send({
 			code: 'CREATED_TASK',
-			result: createdTask,
+			// result: createdTask,
 			success: true
 		});
 
