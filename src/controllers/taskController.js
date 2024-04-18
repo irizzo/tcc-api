@@ -4,7 +4,7 @@ const taskModel = require('../models/taskModel');
 const { dueDateValidation, titleValidation, categoryCodeValidation, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
 const { sanitizeString } = require('../resources/sanitization');
 
-// get from bd
+// TODO: get from bd
 const categories = [];
 const priorities = [];
 const status = [];
@@ -18,7 +18,7 @@ async function createTask(req, res) {
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 
-		// get user session
+		// TODO: get user session
 		// validate user session
 		// if user session is not valid, redirect to log in]
 		// if session is valid, get userId
