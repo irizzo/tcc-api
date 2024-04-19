@@ -1,12 +1,16 @@
 const { db } = require('../firebaseConfig');
 
+const userCategoriesModel = require('./userCategoriesModel');
+
 const usersCollectionRef = db.collection('users');
 
 async function createDbUser(user) {
 	console.log('[createDbUser]');
 
-	const userRef = await usersCollectionRef.add({ ...user, tasks: [], events: [], routines: [] }); // TODO: test if the fields are created on DB
+	const userRef = await usersCollectionRef.add(user);
 	const createdUserId = userRef.id;
+
+	await userCategoriesModel.createUserDefaultCategories(createdUserId);
 
 	return createdUserId;
 }
@@ -49,8 +53,21 @@ async function findUserByEmail(email) {
 	return matchList;
 }
 
+async function findUserById(userId) {
+	console.log('[findUserById]');
+
+	const userRef = usersCollectionRef.doc(userId);
+	const match = await userRef.get();
+	if (!match.exists) {
+		return false;
+	}
+
+	return true
+}
+
 module.exports = {
 	createDbUser,
 	getAllDbUsers,
-	findUserByEmail
+	findUserByEmail,
+	findUserById
 };

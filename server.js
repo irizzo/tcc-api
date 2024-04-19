@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 
 const userController = require('./src/controllers/userController.js');
 const taskController = require('./src/controllers/taskController.js');
+const userCategoriesController = require('./src/controllers/userCategoriesController.js');
 
 const app = express();
 const port = 8080;
@@ -25,6 +26,14 @@ app.post('/login', userController.login);
 
 // task routes
 app.post('/create-task', taskController.createTask);
+
+// category routes
+app.get('/categories/list', userCategoriesController.getAllCategories);
+app.post('/create-category', userCategoriesController.createCategory);
+
+app.get('/categories/:categoryCode', userCategoriesController.getCategoryByCode);
+app.put('/categories/:categoryCode', userCategoriesController.updateCategory);
+app.delete('/categories/:categoryCode', userCategoriesController.deleteCategory);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);

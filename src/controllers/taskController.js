@@ -1,6 +1,4 @@
 const taskModel = require('../models/taskModel');
-const statusModel = require('../models/statusModel');
-const priorityModel = require('../models/priorityModel');
 
 // resources
 const { dueDateValidation, titleValidation, categoryCodeValidation, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
@@ -17,7 +15,7 @@ async function createTask(req, res) {
 
 		// TODO: get user session
 		// validate user session
-		// if user session is not valid, redirect to log in]
+		// if user session is not valid, redirect to log in
 		// if session is valid, get userId
 
 		// sanitization
@@ -102,7 +100,7 @@ async function createTask(req, res) {
 
 		console.log(`taskInfo = ${JSON.stringify(cleanTask)}`);
 
-		res.status(200).send({
+		res.status(201).send({
 			code: 'CREATED_TASK',
 			result: createdTask,
 			success: true
