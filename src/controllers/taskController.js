@@ -1,13 +1,10 @@
 const taskModel = require('../models/taskModel');
+const statusModel = require('../models/statusModel');
+const priorityModel = require('../models/priorityModel');
 
 // resources
 const { dueDateValidation, titleValidation, categoryCodeValidation, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
-const { sanitizeString } = require('../resources/sanitization');
-
-// TODO: get from bd
-const categories = [];
-const priorities = [];
-const status = [];
+const { sanitizeString, sanitizeCodeString } = require('../resources/sanitization');
 
 // get from session
 const userId = 'Qja9BA2MbDAg0IO2MVj3';
@@ -24,26 +21,27 @@ async function createTask(req, res) {
 		// if session is valid, get userId
 
 		// sanitization
-		let cleanTask = {
-			title: '',
-			description: '',
-			dueDate: new Date(),
-			categoryCode,
-			priorityCode,
-			toDoDate: new Date(),
+		const cleanTask = {
 			statusCode: 'NOT_STARTED'
 		}
 
 		cleanTask.title = sanitizeString(title);
 
-		if (description.lenght > 0) {
+		if (description.length > 0) {
 			cleanTask.description = sanitizeString(description);
 		};
-	
-		cleanTask.dueDate = new Date(dueDate); // TODO: handle date https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
-		cleanTask.toDoDate = new Date(toDoDate); // TODO: handle date
-		cleanTask.categoryCode = sanitizeString(categoryCode);
-		cleanTask.priorityCode = sanitizeString(priorityCode); 
+		
+		// TODO: handle date https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+		cleanTask.dueDate = new Date(dueDate); 
+		cleanTask.toDoDate = new Date(toDoDate);
+
+		if (categoryCode?.length > 0) {
+			cleanTask.categoryCode = sanitizeCodeString(categoryCode);
+		};
+
+		if (priorityCode?.length > 0) {
+			cleanTask.priorityCode = sanitizeCodeString(priorityCode);
+		};
 
 		// validation
 		if (!titleValidation(cleanTask.title)) {
@@ -85,9 +83,10 @@ async function createTask(req, res) {
 
 			return;
 		}
-
+		
+		// TODO: Category validation
 		if (!categoryCodeValidation(cleanTask.categoryCode)) {
-			res.status(400).send({
+			res.category(400).send({
 				code: 'INVALID_CATEGORY_CODE',
 				result: null,
 				success: false
@@ -96,20 +95,10 @@ async function createTask(req, res) {
 			return;
 		}
 
-		if (!statusCodeValidation(cleanTask.statusCode)) {
-			res.status(400).send({
-				code: 'INVALID_STATUS_CODE',
-				result: null,
-				success: false
-			});
-
-			return;
-		}
-
 		// create task (DB)
-		const createdTask = await taskModel.createDbTask(cleanTask, userId);
+		// const createdTask = await taskModel.createDbTask(cleanTask, userId);
 
-		console.log(`[createTask] createdTask = ${JSON.stringify(createdTask)}`);
+		// console.log(`[createTask] createdTask = ${JSON.stringify(createdTask)}`);
 
 		console.log(`taskInfo = ${JSON.stringify(cleanTask)}`);
 
