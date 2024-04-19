@@ -11,7 +11,7 @@ async function createCategory(req, res) {
 	console.log('[createCategory] (controller)');
 
 	try {
-		const { title } = req.body;
+		const { title, description } = req.body;
 		
 		// TODO: get user session
 		// TODO: validate user session
@@ -33,6 +33,7 @@ async function createCategory(req, res) {
 		let cleanCategory = { };
 
 		cleanCategory.title = sanitizeString(title);
+		cleanCategory.description = sanitizeString(description);
 
 		// validation
 		if (!titleValidation(cleanCategory.title)) {
@@ -59,7 +60,6 @@ async function createCategory(req, res) {
 		});
 
 	} catch (error) {
-		console.log(`ERROR: ${error}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -98,7 +98,6 @@ async function getAllCategories(req, res) {
 		});
 
 	} catch (error) {
-		console.log(`ERROR: ${error}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -149,7 +148,6 @@ async function getCategoryByCode(req, res) {
 		});
 
 	} catch (error) {
-		console.log(`ERROR: ${error}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -158,8 +156,134 @@ async function getCategoryByCode(req, res) {
 	};
 };
 
+async function updateCategory(req, res) {
+	console.log('[updateCategory] (controller)');
+
+	try {
+		// TODO: get user session
+		// TODO: validate user session
+		// TODO: if user session is not valid, redirect to log in
+		// TODO: if session is valid, get userId
+		// const { userId } = req.session;
+
+		// validate userId
+		const userExists = await userModel.findUserById(userId);
+
+		if (!userExists) {
+			res.status(400).send({
+				code: 'INVALID_USER_ID',
+				result: null,
+				success: false
+			})
+		} else console.log('found user')
+
+		const { categoryCode } = req.params;
+
+		const foundCategoryInfo = await userCategoriesModel.getCategoryByCode(userId, categoryCode);
+
+		if (foundCategoryInfo.length === 0) {
+			res.status(404).send({
+				code: 'CATEGORY_NOT_FOUND',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+
+		const { title, description } = req.body;
+
+		let cleanCategoryInfo = {};
+
+		if(title.length > 0) {
+			cleanCategoryInfo.title = sanitizeString(title);
+		}
+
+		if(description.length > 0) {
+			cleanCategoryInfo.description = sanitizeString(description);
+		}
+
+		console.log(`cleanCategoryInfo = ${JSON.stringify(cleanCategoryInfo)}`);
+
+		const categoryId = foundCategoryInfo[0].id;
+
+		// update on DB
+		const updatedCategory = await userCategoriesModel.updateCategory(userId, categoryId, cleanCategoryInfo)
+
+		res.status(200).send({
+			code: 'UPDATED_CATEGORY',
+			result: updatedCategory,
+			success: true
+		});
+
+	} catch (error) {
+		res.status(500).send({
+			code: 'INTERNAL_ERROR',
+			result: error,
+			success: false
+		});
+	}
+}
+
+async function deleteCategory(req, res) {
+	console.log('[updateCategory] (controller)');
+
+	try {
+		// TODO: get user session
+		// TODO: validate user session
+		// TODO: if user session is not valid, redirect to log in
+		// TODO: if session is valid, get userId
+		// const { userId } = req.session;
+
+		// validate userId
+		const userExists = await userModel.findUserById(userId);
+		if (!userExists) {
+			res.status(400).send({
+				code: 'INVALID_USER_ID',
+				result: null,
+				success: false
+			})
+		} else console.log('found user');
+
+		const { categoryCode } = req.params;
+
+		const foundCategoryInfo = await userCategoriesModel.getCategoryByCode(userId, categoryCode);
+
+		if (foundCategoryInfo.length === 0) {
+			res.status(404).send({
+				code: 'CATEGORY_NOT_FOUND',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+
+		const categoryId = foundCategoryInfo[0].id;
+
+		// delete on db
+		const deletedCategory = await userCategoriesModel.deleteCategory(userId, categoryId);
+		console.log(`deletedCategory = ${deletedCategory}`);
+
+		res.status(200).send({
+			code: 'DELETED_CATEGORY',
+			result: null,
+			success: true
+		});
+		
+	} catch (error) {
+		res.status(500).send({
+			code: 'INTERNAL_ERROR',
+			result: error,
+			success: false
+		});
+	}
+}
+
 module.exports = {
 	createCategory,
 	getAllCategories,
-	getCategoryByCode
+	getCategoryByCode,
+	updateCategory,
+	deleteCategory
 };

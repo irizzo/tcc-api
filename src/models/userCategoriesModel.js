@@ -78,9 +78,29 @@ async function getCategoryByCode(userId, categoryCode) {
 	return matchList;
 }
 
+async function deleteCategory(userId, categoryId) {
+	console.log('[/deleteCategory]');
+
+	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
+	const deleteRes = await categoryRef.delete();
+
+	console.log(`deleteRes = ${deleteRes}`);
+	return deleteRes;
+}
+
+async function updateCategory(userId, categoryId, newInfo) {
+	console.log('[/updateCategory]');
+
+	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
+	const updateRes = await categoryRef.update(newInfo);
+	return updateRes;
+}
+
 module.exports = {
 	createUserDefaultCategories,
 	createDbCategory,
 	getAllDbCategories,
-	getCategoryByCode
+	getCategoryByCode,
+	updateCategory,
+	deleteCategory
 };

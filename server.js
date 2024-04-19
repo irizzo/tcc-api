@@ -29,8 +29,11 @@ app.post('/create-task', taskController.createTask);
 
 // category routes
 app.get('/categories/list', userCategoriesController.getAllCategories);
-app.get('/categories/:categoryCode', userCategoriesController.getCategoryByCode);
 app.post('/create-category', userCategoriesController.createCategory);
+
+app.get('/categories/:categoryCode', userCategoriesController.getCategoryByCode);
+app.put('/categories/:categoryCode', userCategoriesController.updateCategory);
+app.delete('/categories/:categoryCode', userCategoriesController.deleteCategory);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
