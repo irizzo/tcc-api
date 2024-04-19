@@ -6,6 +6,14 @@ function sanitizeString(sourceString) {
 	return cleanString;
 };
 
+// sanitization function for  identifier code strings, like "NOT_STARTED"
+function sanitizeCodeString(sourceString) {
+	// console.log(`[sanitizeString] sourceString = ${sourceString}`);
+
+	const cleanString = sourceString.trim().replace(/[`~!@#$%^&*()|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
+	return cleanString;
+};
+
 function sanitizeEmail(sourceEmail) {
 	// console.log(`[sanitizeEmail] sourceEmail = ${sourceEmail}`);
 
@@ -15,5 +23,6 @@ function sanitizeEmail(sourceEmail) {
 
 module.exports = {
 	sanitizeString,
-	sanitizeEmail
+	sanitizeCodeString,
+	sanitizeEmail,
 };

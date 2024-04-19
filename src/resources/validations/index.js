@@ -1,8 +1,8 @@
+const { findPriorityByCode } = require('../../models/priorityModel');
+const { findStatusByCode } = require('../../models/statusModel');
+
 function dueDateValidation(date) {
 	const today = new Date();
-
-	console.log(`today = ${today} type ${typeof (today)} str ${JSON.stringify(today)}`);
-	console.log(`date = ${date} type ${typeof (date)} str ${JSON.stringify(date)}`);
 
 	if (today > date) {
 		return false;
@@ -52,18 +52,38 @@ function passwordValidation(password) {
 	return true;
 }
 
-// TODO: priorityCodeValidation
-function priorityCodeValidation(priorityCode) {
+async function priorityCodeValidation(priorityCode) {
+	if (!priorityCode || priorityCode.length == 0) {
+		return true
+	}
+
+	const codeMatch = await findPriorityByCode(priorityCode);
+
+	if(!codeMatch || codeMatch.length === 0) {
+		return false
+	}
+
 	return true;
 }
 
 // TODO: categoryCodeValidation
-function categoryCodeValidation(categoryCode) {
+async function categoryCodeValidation(categoryCode) {
+	if (!categoryCode || categoryCode.length == 0) {
+		return true
+	}
+
+	// search for matches on BD
+
 	return true;
 }
 
-// TODO: statusCodeValidation
-function statusCodeValidation(statusCode) {
+async function statusCodeValidation(statusCode) {
+	const codeMatch = await findPriorityByCode(statusCode);
+
+	if (!codeMatch || codeMatch.length === 0) {
+		return false
+	}
+
 	return true;
 }
 
