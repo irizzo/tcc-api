@@ -96,15 +96,15 @@ async function createTask(req, res) {
 		}
 
 		// create task (DB)
-		// const createdTask = await taskModel.createDbTask(cleanTask, userId);
+		const createdTask = await taskModel.createDbTask(cleanTask, userId);
 
-		// console.log(`[createTask] createdTask = ${JSON.stringify(createdTask)}`);
+		console.log(`[createTask] createdTask = ${JSON.stringify(createdTask)}`);
 
 		console.log(`taskInfo = ${JSON.stringify(cleanTask)}`);
 
 		res.status(200).send({
 			code: 'CREATED_TASK',
-			// result: createdTask,
+			result: createdTask,
 			success: true
 		});
 
