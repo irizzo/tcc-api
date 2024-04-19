@@ -82,7 +82,7 @@ async function createUser(req, res) {
 		
 		console.log(`[createUserId] createdUserId = ${createdUserId}`);
 
-		res.status(200).send({
+		res.status(201).send({
 			code: 'USER_CREATED',
 			result: createdUserId,
 			success: true
