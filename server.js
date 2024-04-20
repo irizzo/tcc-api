@@ -40,6 +40,11 @@ app.delete('/categories/:categoryCode', userCategoriesController.deleteCategory)
 app.get('/events/list', eventController.getAllEvents);
 app.post('/create-event', eventController.createEvent);
 
+app.put('/events/:eventId', eventController.updateEvent);
+app.delete('/events/:eventId', eventController.deleteEvent);
+
+app.put('/events/:eventId/update-dates', eventController.updateEventDates);
+
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
 });

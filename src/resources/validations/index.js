@@ -76,7 +76,7 @@ async function priorityCodeValidation(priorityCode) {
 
 // TODO: categoryCodeValidation
 async function categoryCodeValidation(categoryCode) {
-	if (!categoryCode || categoryCode.length == 0) {
+	if (categoryCode === null) {
 		return true
 	}
 
