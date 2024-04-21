@@ -37,8 +37,8 @@ app.put('/categories/:categoryCode', userCategoriesController.updateCategory);
 app.delete('/categories/:categoryCode', userCategoriesController.deleteCategory);
 
 // event routes
-app.get('/events/list', eventController.getAllEvents);
-app.post('/create-event', eventController.createEvent);
+app.get('/events/list', eventController.getUserEvents);
+app.post('/create-event', eventController.createNewEvent);
 
 app.put('/events/:eventId', eventController.updateEvent);
 app.delete('/events/:eventId', eventController.deleteEvent);

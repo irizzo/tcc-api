@@ -65,9 +65,34 @@ async function findUserById(userId) {
 	return true
 }
 
+async function addEventRef(userId, eventId) {
+	console.log('[addEventRef] (model)');
+	let updatedEventsList = [];
+
+	const userRef = usersCollectionRef.doc(userId);
+	const userMatch = await userRef.get();
+	const eventsList = userMatch.data().events;
+
+	if(eventsList.length !== 0) {
+		if (!eventsList.includes(eventId)) {
+			updatedEventsList = eventsList.concat(eventId);
+		}
+	} else {
+		updatedEventsList.push(eventId);
+	}
+
+	if(updatedEventsList.length !== 0) {
+		await userRef.update({ events: updatedEventsList});
+	}
+	
+	return;
+}
+
+
 module.exports = {
 	createDbUser,
 	getAllDbUsers,
 	findUserByEmail,
-	findUserById
+	findUserById,
+	addEventRef
 };
