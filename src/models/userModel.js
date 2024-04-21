@@ -5,7 +5,7 @@ const userCategoriesModel = require('./userCategoriesModel');
 const usersCollectionRef = db.collection('users');
 
 async function createDbUser(user) {
-	console.log('[createDbUser]');
+	console.log('[createDbUser] (model)');
 
 	const userRef = await usersCollectionRef.add(user);
 	const createdUserId = userRef.id;
@@ -16,7 +16,7 @@ async function createDbUser(user) {
 }
 
 async function getAllDbUsers() {
-	console.log('[getAllDbUsers]');
+	console.log('[getAllDbUsers] (model)');
 
 	const usersList = [];
 
@@ -33,7 +33,7 @@ async function getAllDbUsers() {
 }
 
 async function findUserByEmail(email) {
-	console.log('[findUserByEmail]');
+	console.log('[findUserByEmail] (model)');
 
 	const snapshot = await usersCollectionRef.where('email', '==', email).get();
 	const matchList = [];
@@ -54,7 +54,7 @@ async function findUserByEmail(email) {
 }
 
 async function findUserById(userId) {
-	console.log('[findUserById]');
+	console.log('[findUserById] (model)');
 
 	const userRef = usersCollectionRef.doc(userId);
 	const match = await userRef.get();

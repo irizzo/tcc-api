@@ -4,7 +4,7 @@ const tasksCollectionRef = db.collection('tasks');
 
 // Criar uma tarefa
 async function createDbTask(task, userId) {
-	console.log('[createDbTask]');
+	console.log('[createDbTask] (model)');
 
 	const taskRef = await tasksCollectionRef.add({ ...task, userId }); 
 	const createdTaskId = taskRef.id;
@@ -14,7 +14,7 @@ async function createDbTask(task, userId) {
 
 // Recuperar tarefas de um usuário
 async function getUserTasks(userId) {
-	console.log('[getUserTasks]');
+	console.log('[getUserTasks] (model)');
 
 	const snapshot = await tasksCollectionRef.where('userId', '==', userId).get();
 	const matchList = [];

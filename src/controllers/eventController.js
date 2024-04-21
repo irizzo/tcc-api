@@ -1,6 +1,5 @@
 const eventModel = require('../models/eventModel');
 const userModel = require('../models/userModel');
-const userSessionModel = require('../models/userSessionModel');
 
 const { sanitizeString, sanitizeCodeString } = require('../resources/sanitization');
 const { dueDateValidation, endDateValidation, titleValidation, categoryCodeValidation } = require('../resources/validations');
@@ -15,8 +14,6 @@ async function createEvent(req, res) {
 		const { title, description, startDate, endDate, categoryCode } = req.body;
 
 		// TODO: userSession
-		// const userSession = req.session;
-		// const userId = userSessionModel.checkUserSession(userSession);
 
 		// sanitization
 		const cleanEventInfo = {};
@@ -99,11 +96,7 @@ async function getAllEvents(req, res) {
 	console.log('[getAllEvents] (controller)');
 
 	try {
-		// TODO: get user session
-		// TODO: validate user session
-		// TODO: if user session is not valid, redirect to log in
-		// TODO: if session is valid, get userId
-		// const { userId } = req.session;
+		// TODO: userSession
 
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
@@ -140,11 +133,7 @@ async function getEventByTitle(req, res) {
 	console.log('[getEventByTitle] (controller)');
 
 	try {
-		// TODO: get user session
-		// TODO: validate user session
-		// TODO: if user session is not valid, redirect to log in
-		// TODO: if session is valid, get userId
-		// const { userId } = req.session;
+		// TODO: userSession
 
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
@@ -158,7 +147,6 @@ async function getEventByTitle(req, res) {
 		} else console.log('found user');
 
 		const { eventTitle } = req.params;
-
 
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
@@ -174,8 +162,6 @@ async function updateEventDates(req, res) {
 	console.log('[updateEventDates] (controller)');
 	try {
 		// TODO: userSession
-		// const userSession = req.session;
-		// const userId = userSessionModel.checkUserSession(userSession);
 
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
@@ -245,13 +231,12 @@ async function updateEventDates(req, res) {
 		});
 	}
 }
+
 async function updateEvent(req, res) {
 	console.log('[updateEvent] (controller)');
 
 	try {
 		// TODO: userSession
-		// const userSession = req.session;
-		// const userId = userSessionModel.checkUserSession(userSession);
 
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
@@ -341,6 +326,19 @@ async function updateEvent(req, res) {
 async function deleteEvent(req, res) {
 	console.log('[deleteEvent] (controller)');
 	try {
+		// TODO: userSession
+
+		// validate userId
+		const userExists = await userModel.findUserById(userId);
+
+		if (!userExists) {
+			res.status(400).send({
+				code: 'INVALID_USER_ID',
+				result: null,
+				success: false
+			})
+		} else console.log('found user');
+
 		const { eventId } = req.params;
 
 		const foundEvent = await eventModel.findEventById(eventId);
@@ -377,7 +375,6 @@ async function deleteEvent(req, res) {
 module.exports = {
 	createEvent,
 	getAllEvents,
-	// getEventByTitle,
 	updateEventDates,
 	updateEvent,
 	deleteEvent

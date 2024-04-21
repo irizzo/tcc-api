@@ -3,7 +3,7 @@ const { db } = require('../firebaseConfig');
 const statusCollectionRef = db.collection('status');
 
 async function getAllDbStatus() {
-	console.log(`[getAllDbStatus]`);
+	console.log('[getAllDbStatus] (model)');
 
 	const statusList = [];
 
@@ -20,7 +20,7 @@ async function getAllDbStatus() {
 }
 
 async function findStatusByCode(code) {
-	console.log('[findStatusByCode]');
+	console.log('[findStatusByCode] (model)');
 
 	const snapshot = await statusCollectionRef.where('code', '==', code).get();
 	const matchList = [];
