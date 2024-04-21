@@ -4,8 +4,14 @@ const userModel = require('../models/userModel');
 async function createNewEvent(userId, newEventInfo) {
 	console.log('[createNewEvent] (service)');
 	try {
-		const eventInfo = { ...newEventInfo, createdAt: Date.now(), updatedAt: Date.now() };
-		const createdEventId = await eventModel.createDbEvent(userId, eventInfo);
+		const eventInfo = {
+			...newEventInfo,
+			createdAt: Date.now(), 
+			updatedAt: Date.now(),
+			userId
+		};
+
+		const createdEventId = await eventModel.createDbEvent(eventInfo);
 		await userModel.addEventRef(userId, createdEventId);
 
 		return createdEventId;

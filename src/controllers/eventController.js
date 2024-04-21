@@ -1,5 +1,4 @@
-const eventModel = require('../models/eventModel');
-const userModel = require('../models/userModel');
+const userModel = require('../models/userModel'); // TODO: userService
 
 const eventService = require('../services/eventService');
 
@@ -82,7 +81,7 @@ async function getUserEvents(req, res) {
 		res.status(200).send({ code: 'OK', result: eventsList, success: true });
 		
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
+
 		console.log(`ERROR = ${error}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
@@ -171,17 +170,18 @@ async function updateEvent(req, res) {
 			cleanEventInfo.categoryCode = sanitizeCodeString(categoryCode);
 		}
 
-		// validation 
-		if (!cleanEventInfo.title) {
-		} else if (!titleValidation(cleanEventInfo.title)) {
+		// validations
+		if (cleanEventInfo.title && !titleValidation(cleanEventInfo.title)) {
 			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
 			return;
 		}
-
-		if (!cleanEventInfo.categoryCode) {
-		} else if (!categoryCodeValidation(cleanEventInfo.categoryCode)) {
-			// TODO: Category validation
-			res.category(400).send({ code: 'INVALID_CATEGORY_CODE', result: null, success: false });
+		// TODO: Category validation
+		if (cleanEventInfo.categoryCode && !categoryCodeValidation(cleanEventInfo.categoryCode)) {
+			res.category(400).send({
+				code: 'INVALID_CATEGORY_CODE',
+				result: null,
+				success: false
+			});
 			return;
 		}
 
