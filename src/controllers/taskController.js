@@ -1,4 +1,6 @@
-const taskModel = require('../models/taskModel');
+const userModel = require('../models/userModel'); // TODO: userService
+
+const taskService = require('../services/taskService'); 
 
 // resources
 const { dueDateValidation, titleValidation, categoryCodeValidation, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
@@ -7,101 +9,61 @@ const { sanitizeString, sanitizeCodeString } = require('../resources/sanitizatio
 // TODO: get from user session
 const userId = "stQM4UlD6n6c6h9Lmi7w";
 
-async function createTask(req, res) {
+async function createNewTask(req, res) {
+	console.log('[createNewTaskController]');
 	try {
-		console.log('[createTaskController]');
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 
-		// TODO: get user session
-		// validate user session
-		// if user session is not valid, redirect to log in
-		// if session is valid, get userId
+		// TODO: userSession
 
 		// sanitization
-		const cleanTask = {
-			statusCode: 'NOT_STARTED'
+		const cleanTaskInfo = {
+			title: sanitizeString(title),
+			description: description === null ? null : sanitizeString(description),
+			dueDate: dueDate === null ? null : new Date(dueDate),  // TODO: handle date https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+			toDoDate: toDoDate === null ? null : new Date(toDoDate),
+			categoryCode: categoryCode === null ? null : sanitizeCodeString(categoryCode),
+			priorityCode: priorityCode === null ? null : sanitizeCodeString(priorityCode)
 		}
-
-		cleanTask.title = sanitizeString(title);
-
-		// TODO: remove condition (leave only on validation)
-		if (description.length > 0) {
-			cleanTask.description = sanitizeString(description);
-		};
-		
-		// TODO: handle date https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
-		cleanTask.dueDate = new Date(dueDate); 
-		cleanTask.toDoDate = new Date(toDoDate);
-
-		// TODO: remove condition (leave only on validation)
-		if (categoryCode?.length > 0) {
-			cleanTask.categoryCode = sanitizeCodeString(categoryCode);
-		};
-
-		// TODO: remove condition (leave only on validation)
-		if (priorityCode?.length > 0) {
-			cleanTask.priorityCode = sanitizeCodeString(priorityCode);
-		};
 
 		// validation
-		if (!titleValidation(cleanTask.title)) {
-			res.status(400).send({
-				code: 'INVALID_TITLE',
-				result: null,
-				success: false
-			});
-
+		if (!titleValidation(cleanTaskInfo.title)) {
+			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
 			return;
 		}
 
-		if (!dueDateValidation(cleanTask.dueDate)) {
-			res.status(400).send({
-				code: 'INVALID_DUE_DATE',
-				result: null,
-				success: false
-			});
-
+		if (cleanTaskInfo.dueDate === null) {
+		} else if (!dueDateValidation(cleanTaskInfo.dueDate)) {
+			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
 			return;
 		}
 
-		if (!dueDateValidation(cleanTask.toDoDate)) {
-			res.status(400).send({
-				code: 'INVALID_DUE_DATE',
-				result: null,
-				success: false
-			});
-
+		if (cleanTaskInfo.toDoDate === null) {
+		} else if (!dueDateValidation(cleanTaskInfo.toDoDate)) {
+			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
 			return;
 		}
 		
-		if (!priorityCodeValidation(cleanTask.priorityCode)) {
-			res.status(400).send({
-				code: 'INVALID_PRIORITY_CODE',
-				result: null,
-				success: false
-			});
-
+		if(cleanTaskInfo.priorityCode === null ) {
+		} else if (!priorityCodeValidation(cleanTaskInfo.priorityCode)) {
+			res.status(400).send({ code: 'INVALID_PRIORITY_CODE', result: null, success: false });
 			return;
 		}
 		
 		// TODO: Category validation
-		if (!categoryCodeValidation(cleanTask.categoryCode)) {
+		if (cleanTaskInfo.categoryCode === null) {
+
+		} else if (!categoryCodeValidation(cleanTaskInfo.categoryCode)) {
 			res.category(400).send({
-				code: 'INVALID_CATEGORY_CODE',
+				code:'INVALID_CATEGORY_CODE',
 				result: null,
 				success: false
 			});
-
 			return;
 		}
 
-		// create task (DB)
-		const createdTask = await taskModel.createDbTask(cleanTask, userId);
-
-		console.log(`[createTask] createdTask = ${JSON.stringify(createdTask)}`);
-
-		console.log(`taskInfo = ${JSON.stringify(cleanTask)}`);
+		const createdTask = await taskService.createNewTask(userId, cleanTaskInfo);
 
 		res.status(201).send({
 			code: 'CREATED_TASK',
@@ -119,6 +81,135 @@ async function createTask(req, res) {
 	}
 }
 
+async function getAllTasks(req, res) {
+	console.log('[getAllTasks] (controller)');
+	try {
+		// TODO: userSession
+
+		const tasksList = await taskService.getUserTasks(userId);
+
+		res.status(200).send({ code: 'OK', result: tasksList, success: true });
+
+	} catch (error) {
+		console.log(`ERROR = ${error}`);
+		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+	}
+}
+
+async function getTaskDetails(req, res) {
+	console.log('[getTaskDetails] (controller)');
+	try {
+		// TODO: userSession
+
+		const { taskId } = req.params;
+
+		const foundTask = await taskService.getUserTaskById(taskId);
+		if (!foundTask) {
+			res.status(404).send({ code: 'TASK_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
+		res.status(200).send({ code: 'OK', result: foundTask.data(), success: true });
+
+	} catch (error) {
+		console.log(`ERROR = ${error}`);
+		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+	}
+}
+
+async function updateTaskInfo(req, res) {
+	console.log('[updateTaskInfoController]');
+	try {
+		// TODO: userSession
+
+		const { taskId } = req.params;
+
+		const foundTask = await taskService.getUserTaskById(taskId);
+		if (!foundTask) {
+			res.status(404).send({ code: 'TASK_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
+		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
+
+		// sanitization
+		const cleanTaskInfo = {};
+
+		if (title !== null) cleanTaskInfo.title = sanitizeString(title);
+		if (description !== null) cleanTaskInfo.description = sanitizeString(description);
+		if (dueDate !== null) cleanTaskInfo.dueDate = new Date(dueDate);
+		if (toDoDate !== null) cleanTaskInfo.toDoDate = new Date(toDoDate);
+		if (categoryCode !== null) cleanTaskInfo.categoryCode = sanitizeCodeString(categoryCode);
+		if (priorityCode !== null) cleanTaskInfo.priorityCode = sanitizeCodeString(priorityCode);;
+
+		// validations
+		if (cleanTaskInfo.title && !titleValidation(cleanTaskInfo.title)) {
+			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
+			return;
+		}
+
+		if (cleanTaskInfo.dueDate && !dueDateValidation(cleanTaskInfo.dueDate)) {
+			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
+			return;
+		}
+
+		if (cleanTaskInfo.toDoDate && !dueDateValidation(cleanTaskInfo.toDoDate)) {
+			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
+			return;
+		}
+
+		if (cleanTaskInfo.priorityCode && !priorityCodeValidation(cleanTaskInfo.priorityCode)) {
+			res.status(400).send({ code: 'INVALID_PRIORITY_CODE', result: null, success: false });
+			return;
+		}
+
+		// TODO: Category validation
+		if (cleanTaskInfo.categoryCode && !categoryCodeValidation(cleanTaskInfo.categoryCode)) {
+			res.category(400).send({
+				code: 'INVALID_CATEGORY_CODE',
+				result: null,
+				success: false
+			});
+			return;
+		}
+
+		const updatedTask = await taskService.updateTaskInfo(taskId, cleanTaskInfo);
+
+		res.status(200).send({ code: 'UPDATED_TASK', result: null, success: true });
+
+	} catch (error) {
+		console.log(`ERROR = ${error}`);
+		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+	}
+}
+
+async function deleteTask(req, res) {
+	console.log('[deleteTaskInfoController]');
+
+	try {
+		// TODO: userSession
+
+		const { taskId } = req.params;
+
+		const foundTask = await taskService.getUserTaskById(taskId);
+		if (!foundTask) {
+			res.status(404).send({ code: 'TASK_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
+		await taskService.deleteTask(taskId);
+		res.status(200).send({ code: 'DELETED_TASK', result: null, success: true });
+	
+	} catch (error) {
+		console.log(`ERROR = ${error}`);
+		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+	}
+}
+
 module.exports = {
-	createTask
+	createNewTask,
+	getAllTasks,
+	getTaskDetails,
+	updateTaskInfo,
+	deleteTask
 }

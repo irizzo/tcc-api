@@ -26,19 +26,24 @@ app.post('/create-user', userController.createUser);
 app.post('/login', userController.login);
 
 // task routes
-app.post('/create-task', taskController.createTask);
+app.get('/tasks', taskController.getAllTasks); // list all tasks
+app.post('/tasks', taskController.createNewTask);
+
+app.get('/tasks/:taskId', taskController.getTaskDetails); // task details
+app.put('/tasks/:taskId', taskController.updateTaskInfo); // update an existing task's details
+app.delete('/tasks/:taskId', taskController.deleteTask) // detele an existing task
 
 // category routes
-app.get('/categories/list', userCategoriesController.getAllCategories);
-app.post('/create-category', userCategoriesController.createCategory);
+app.get('/categories', userCategoriesController.getAllCategories); // list all categories
+app.post('/categories', userCategoriesController.createCategory); // create new category
 
-app.get('/categories/:categoryCode', userCategoriesController.getCategoryByCode);
+app.get('/categories/:categoryCode', userCategoriesController.getCategoryByCode); // get category details 
 app.put('/categories/:categoryCode', userCategoriesController.updateCategory);
 app.delete('/categories/:categoryCode', userCategoriesController.deleteCategory);
 
 // event routes
-app.get('/events/list', eventController.getUserEvents);
-app.post('/create-event', eventController.createNewEvent);
+app.get('/events', eventController.getUserEvents); // list all events
+app.post('/events', eventController.createNewEvent); // create new event
 
 app.put('/events/:eventId', eventController.updateEvent);
 app.delete('/events/:eventId', eventController.deleteEvent);
