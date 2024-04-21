@@ -4,8 +4,8 @@ const taskModel = require('../models/taskModel');
 const { dueDateValidation, titleValidation, categoryCodeValidation, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
 const { sanitizeString, sanitizeCodeString } = require('../resources/sanitization');
 
-// get from session
-const userId = 'Qja9BA2MbDAg0IO2MVj3';
+// TODO: get from user session
+const userId = "stQM4UlD6n6c6h9Lmi7w";
 
 async function createTask(req, res) {
 	try {
@@ -25,6 +25,7 @@ async function createTask(req, res) {
 
 		cleanTask.title = sanitizeString(title);
 
+		// TODO: remove condition (leave only on validation)
 		if (description.length > 0) {
 			cleanTask.description = sanitizeString(description);
 		};
@@ -33,10 +34,12 @@ async function createTask(req, res) {
 		cleanTask.dueDate = new Date(dueDate); 
 		cleanTask.toDoDate = new Date(toDoDate);
 
+		// TODO: remove condition (leave only on validation)
 		if (categoryCode?.length > 0) {
 			cleanTask.categoryCode = sanitizeCodeString(categoryCode);
 		};
 
+		// TODO: remove condition (leave only on validation)
 		if (priorityCode?.length > 0) {
 			cleanTask.priorityCode = sanitizeCodeString(priorityCode);
 		};
@@ -71,7 +74,7 @@ async function createTask(req, res) {
 
 			return;
 		}
-
+		
 		if (!priorityCodeValidation(cleanTask.priorityCode)) {
 			res.status(400).send({
 				code: 'INVALID_PRIORITY_CODE',

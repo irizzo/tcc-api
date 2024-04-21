@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const userController = require('./src/controllers/userController.js');
 const taskController = require('./src/controllers/taskController.js');
 const userCategoriesController = require('./src/controllers/userCategoriesController.js');
+const eventController = require('./src/controllers/eventController.js');
 
 const app = express();
 const port = 8080;
@@ -34,6 +35,15 @@ app.post('/create-category', userCategoriesController.createCategory);
 app.get('/categories/:categoryCode', userCategoriesController.getCategoryByCode);
 app.put('/categories/:categoryCode', userCategoriesController.updateCategory);
 app.delete('/categories/:categoryCode', userCategoriesController.deleteCategory);
+
+// event routes
+app.get('/events/list', eventController.getAllEvents);
+app.post('/create-event', eventController.createEvent);
+
+app.put('/events/:eventId', eventController.updateEvent);
+app.delete('/events/:eventId', eventController.deleteEvent);
+
+app.put('/events/:eventId/update-dates', eventController.updateEventDates);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);

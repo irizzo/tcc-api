@@ -5,6 +5,7 @@ const { titleValidation } = require('../resources/validations');
 const { sanitizeString } = require('../resources/sanitization');
 const generateIdentifierCode = require('../resources/generateIdentifier');
 
+// TODO: get from user session
 const userId = "stQM4UlD6n6c6h9Lmi7w";
 
 async function createCategory(req, res) {
