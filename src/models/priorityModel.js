@@ -3,7 +3,7 @@ const { db } = require('../firebaseConfig');
 const prioritiesCollectionRef = db.collection('priorities');
 
 async function getAllDbPriorities() {
-	console.log(`[getAllDbPriorities]`);
+	console.log('[getAllDbPriorities] (model)');
 
 	const prioritiesList = [];
 
@@ -20,7 +20,7 @@ async function getAllDbPriorities() {
 }
 
 async function findPriorityByCode(code) {
-	console.log('[findPriorityByCode]');
+	console.log('[findPriorityByCode] (model)');
 
 	const snapshot = await prioritiesCollectionRef.where('code', '==', code).get();
 	const matchList = [];

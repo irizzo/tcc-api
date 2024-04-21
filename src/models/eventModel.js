@@ -2,16 +2,15 @@ const { db } = require('../firebaseConfig');
 
 const eventsCollectionRef = db.collection('events');
 
-async function createDbEvent(event, userId) {
+async function createDbEvent(eventInfo) {
 	console.log('[createDbEvent] (model)');
 
-	const createEventRes = await eventsCollectionRef.add({ ...event, userId });
+	const createEventRes = await eventsCollectionRef.add(eventInfo);
 	const createdEventId = createEventRes.id;
 
 	return createdEventId;
 }
 
-// Recuperar eventos de um usuário
 async function getUserEvents(userId) {
 	console.log('[getUserEvents] (model)');
 
@@ -36,19 +35,15 @@ async function getUserEvents(userId) {
 async function findEventById(eventId) {
 	console.log('[findEventById] (model)');
 
-	const userRef = eventsCollectionRef.doc(eventId);
-	const match = await userRef.get();
+	const eventRef = eventsCollectionRef.doc(eventId);
+	const match = await eventRef.get();
 
-	if (!match.exists) {
+	if (!match.exists) { 
 		return false;
 	}
 
 	return match; 
 }
-
-// async function getUserEventsByTitle(userId, eventTitle) {
-// 	console.log('[getUserEventsByTitle] (model)');
-// }
 
 async function updateEvent(eventId, newInfo) {
 	console.log('[updateEvent] (model)');
@@ -67,7 +62,6 @@ async function deleteEvent(eventId) {
 module.exports = {
 	createDbEvent,
 	getUserEvents,
-	// getUserEventsByTitle,
 	findEventById,
 	updateEvent,
 	deleteEvent

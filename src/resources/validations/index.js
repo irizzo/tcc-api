@@ -34,7 +34,7 @@ function emailValidation(email) {
 }
 
 function titleValidation(title) {
-	if (!title || title.length < 3) {
+	if (!title || title.length < 1) {
 		return false;
 	}
 

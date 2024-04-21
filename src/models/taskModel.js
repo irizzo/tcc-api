@@ -3,10 +3,10 @@ const { db } = require('../firebaseConfig');
 const tasksCollectionRef = db.collection('tasks');
 
 // Criar uma tarefa
-async function createDbTask(task, userId) {
-	console.log('[createDbTask]');
+async function createDbTask(taskInfo) {
+	console.log('[createDbTask] (model)');
 
-	const taskRef = await tasksCollectionRef.add({ ...task, userId }); 
+	const taskRef = await tasksCollectionRef.add(taskInfo); 
 	const createdTaskId = taskRef.id;
 
 	return createdTaskId;
@@ -14,7 +14,7 @@ async function createDbTask(task, userId) {
 
 // Recuperar tarefas de um usuário
 async function getUserTasks(userId) {
-	console.log('[getUserTasks]');
+	console.log('[getUserTasks] (model)');
 
 	const snapshot = await tasksCollectionRef.where('userId', '==', userId).get();
 	const matchList = [];
@@ -34,9 +34,38 @@ async function getUserTasks(userId) {
 	return matchList;
 }
 
-// Recuperar uma tarefa por id
+async function findTaskById(taskId) {
+	console.log('[findTaskById] (model)');
+
+	const taskRef = tasksCollectionRef.doc(taskId);
+	const match = await taskRef.get();
+
+	if (!match.exists) {
+		return false;
+	}
+
+	return match;
+}
+
+async function updateTask(taskId, newInfo) {
+	console.log('[updateTask] (model)');
+	const taskRef = tasksCollectionRef.doc(taskId);
+	const updateRes = await taskRef.update(newInfo);
+	return updateRes;
+}
+
+async function deleteTask(taskId) {
+	console.log('[deleteTask] (model)');
+	const taskRef = tasksCollectionRef.doc(taskId);
+	const deleteRes = await taskRef.delete();
+	return deleteRes;
+}
+
 
 module.exports = {
 	createDbTask,
-	getUserTasks
+	getUserTasks,
+	findTaskById,
+	updateTask,
+	deleteTask
 }

@@ -21,7 +21,7 @@ const defaultCategories = [
 ]
 
 async function createUserDefaultCategories(userId) {
-	console.log(`[createUserDefaultCategories]`);
+	console.log(`[createUserDefaultCategories] (model)`);
 
 	console.log(`userId = ${userId}`);
 
@@ -35,7 +35,7 @@ async function createUserDefaultCategories(userId) {
 }
 
 async function createDbCategory(userId,category) {
-	console.log('[/createDbCategory]');
+	console.log('[createDbCategory] (model)');
 	
 	const categoryRef = await usersCollectionRef.doc(userId).collection('categories').add(category);
 	const createdCategoryId = categoryRef.id;
@@ -44,7 +44,7 @@ async function createDbCategory(userId,category) {
 }
 
 async function getAllDbCategories(userId) {
-	console.log('[/getAllDbCategories]');
+	console.log('[getAllDbCategories] (model)');
 
 	const categoriesList = [];
 
@@ -58,7 +58,7 @@ async function getAllDbCategories(userId) {
 }
 
 async function getCategoryByCode(userId, categoryCode) {
-	console.log('[/getCategoryByCode]');
+	console.log('[getCategoryByCode] (model)');
 
 	const matchList = [];
 	const snapshot = await usersCollectionRef.doc(userId).collection('categories').where('code', '==', categoryCode).get();
@@ -79,7 +79,7 @@ async function getCategoryByCode(userId, categoryCode) {
 }
 
 async function deleteCategory(userId, categoryId) {
-	console.log('[/deleteCategory]');
+	console.log('[deleteCategory] (model)');
 
 	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
 	const deleteRes = await categoryRef.delete();
@@ -89,7 +89,7 @@ async function deleteCategory(userId, categoryId) {
 }
 
 async function updateCategory(userId, categoryId, newInfo) {
-	console.log('[/updateCategory]');
+	console.log('[updateCategory] (model)');
 
 	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
 	const updateRes = await categoryRef.update(newInfo);
