@@ -2,7 +2,7 @@ const userModel = require('../models/userModel'); // TODO: userService
 
 const eventService = require('../services/eventService');
 
-const { sanitizeString, sanitizeCodeString } = require('../resources/sanitization');
+const { generalSanitization } = require('../resources/sanitization');
 const { dueDateValidation, endDateValidation, titleValidation, categoryCodeValidation } = require('../resources/validations');
 
 // TODO: get from user session
@@ -18,11 +18,11 @@ async function createNewEvent(req, res) {
 
 		// sanitization
 		const cleanEventInfo = {
-			title: sanitizeString(title),
-			description: sanitizeString(description),
+			title: generalSanitization(title),
+			description: generalSanitization(description),
 			startDate: new Date(startDate),
 			endDate: new Date(endDate),
-			categoryCode: categoryCode === null ? null : sanitizeCodeString(categoryCode)
+			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode)
 		};
 
 		// validations
@@ -159,15 +159,15 @@ async function updateEvent(req, res) {
 		const { title, description, categoryCode } = req.body;
 
 		if (title !== null) {
-			cleanEventInfo.title = sanitizeString(title);
+			cleanEventInfo.title = generalSanitization(title);
 		}
 
 		if (description !== null) {
-			cleanEventInfo.description = sanitizeString(description);
+			cleanEventInfo.description = generalSanitization(description);
 		}
 
 		if (categoryCode !== null) {
-			cleanEventInfo.categoryCode = sanitizeCodeString(categoryCode);
+			cleanEventInfo.categoryCode = generalSanitization(categoryCode);
 		}
 
 		// validations

@@ -2,7 +2,7 @@ const userModel = require('../models/userModel');
 const userCategoriesService = require('../services/userCategoriesService');
 
 const { titleValidation } = require('../resources/validations');
-const { sanitizeString, sanitizeCodeString } = require('../resources/sanitization');
+const { generalSanitization } = require('../resources/sanitization');
 const generateIdentifierCode = require('../resources/generateIdentifier');
 
 // TODO: get from user session
@@ -184,8 +184,8 @@ async function updateCategory(req, res) {
 
 		let cleanCategoryInfo = {};
 
-		if (title !== null) cleanTaskInfo.title = sanitizeString(title);
-		if (description !== null) cleanTaskInfo.description = sanitizeString(description);
+		if (title !== null) cleanTaskInfo.title = generalSanitization(title);
+		if (description !== null) cleanTaskInfo.description = generalSanitization(description);
 
 		const categoryId = foundCategoryInfo[0].id;
 
