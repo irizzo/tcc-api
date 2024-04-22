@@ -1,5 +1,5 @@
 const { getPriorityByCode } = require('../../services/priorityService');
-const { findStatusByCode } = require('../../models/statusModel');
+const { getStatusByCode } = require('../../services/statusService');
 
 function dueDateValidation(date) {
 	const today = new Date();
@@ -87,12 +87,13 @@ async function categoryCodeValidation(categoryCode) {
 }
 
 async function statusCodeValidation(statusCode) {
-	// const codeMatch = await findPriorityByCode(statusCode);
+	const codeMatch = await getStatusByCode(statusCode);
 
-	if (!codeMatch || codeMatch.length === 0) {
+	if (codeMatch.length === 0) {
 		return false
 	}
 
+	console.log(`codeMatch = ${JSON.stringify(codeMatch)}`);
 	return true;
 }
 
