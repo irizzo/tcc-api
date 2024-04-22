@@ -1,5 +1,5 @@
-const userCategoriesModel = require('../models/userCategoriesModel');
 const userModel = require('../models/userModel');
+const userCategoriesService = require('../services/userCategoriesService');
 
 const { titleValidation } = require('../resources/validations');
 const { sanitizeString } = require('../resources/sanitization');
@@ -50,7 +50,7 @@ async function createCategory(req, res) {
 		cleanCategory.code = generateIdentifierCode(cleanCategory.title);
 
 		// create on DB
-		const createdCategoryRes = await userCategoriesModel.createDbCategory(userId, cleanCategory);
+		const createdCategoryRes = await userCategoriesService.createNewCategory(userId, cleanCategory);
 
 		console.log(`cleanCategory = ${JSON.stringify(cleanCategory)}`);
 		
@@ -90,7 +90,7 @@ async function getAllCategories(req, res) {
 			})
 		}
 
-		const categoriesList = await userCategoriesModel.getAllDbCategories(userId);
+		const categoriesList = await userCategoriesService.getAllUserCategories(userId);
 
 		res.status(200).send({
 			code: 'OK',
@@ -130,7 +130,7 @@ async function getCategoryByCode(req, res) {
 		
 		const { categoryCode } = req.params;
 
-		const foundCategoryInfo = await userCategoriesModel.getCategoryByCode(userId, categoryCode);
+		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, categoryCode);
 
 		if (!foundCategoryInfo) {
 			res.status(404).send({
@@ -180,7 +180,7 @@ async function updateCategory(req, res) {
 
 		const { categoryCode } = req.params;
 
-		const foundCategoryInfo = await userCategoriesModel.getCategoryByCode(userId, categoryCode);
+		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, categoryCode);
 
 		if (foundCategoryInfo.length === 0) {
 			res.status(404).send({
@@ -208,8 +208,7 @@ async function updateCategory(req, res) {
 
 		const categoryId = foundCategoryInfo[0].id;
 
-		// update on DB
-		const updatedCategory = await userCategoriesModel.updateCategory(userId, categoryId, cleanCategoryInfo)
+		const updatedCategory = await userCategoriesService.updateCategory(userId, categoryId, cleanCategoryInfo);
 
 		res.status(200).send({
 			code: 'UPDATED_CATEGORY',
@@ -227,7 +226,7 @@ async function updateCategory(req, res) {
 }
 
 async function deleteCategory(req, res) {
-	console.log('[updateCategory] (controller)');
+	console.log('[deleteCategory] (controller)');
 
 	try {
 		// TODO: get user session
@@ -248,7 +247,7 @@ async function deleteCategory(req, res) {
 
 		const { categoryCode } = req.params;
 
-		const foundCategoryInfo = await userCategoriesModel.getCategoryByCode(userId, categoryCode);
+		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, categoryCode);
 
 		if (foundCategoryInfo.length === 0) {
 			res.status(404).send({
@@ -262,8 +261,7 @@ async function deleteCategory(req, res) {
 
 		const categoryId = foundCategoryInfo[0].id;
 
-		// delete on db
-		const deletedCategory = await userCategoriesModel.deleteCategory(userId, categoryId);
+		const deletedCategory = await userCategoriesService.deleteCategory(userId, categoryId);
 		console.log(`deletedCategory = ${deletedCategory}`);
 
 		res.status(200).send({

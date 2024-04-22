@@ -23,8 +23,9 @@ async function createUserDefaultCategories(userId) {
 
 	try {
 		defaultCategories.forEach(async (category) => {
-			await userCategoriesModel.createDbCategory(userId, category)
+			await userCategoriesModel.createDbCategory(userId, category);
 		})
+
 	} catch (error) {
 		throw error
 	}
@@ -32,8 +33,7 @@ async function createUserDefaultCategories(userId) {
 
 async function createNewCategory(userId, category) {
 	try {
-		const createdCategory = await userCategoriesModel.createDbCategory(userId, category);
-		return createdCategory;
+		return await userCategoriesModel.createDbCategory(userId, category);
 	} catch (error) {
 		throw error
 	}
@@ -41,31 +41,31 @@ async function createNewCategory(userId, category) {
 
 async function getAllUserCategories(userId) {
 	try {
-
+		return await userCategoriesModel.getAllDbCategories(userId);
 	} catch (error) {
 		throw error
 	}
 }
 
-async function getCategoryByCode(categoryCode) {
+async function getCategoryByCode(userId, categoryCode) {
 	try {
-
+		return await userCategoriesModel.getCategoryByCode(userId, categoryCode);
 	} catch (error) {
 		throw error
 	}
 }
 
-async function updateCategory(userId, categoryCode, newInfo) {
+async function updateCategory(userId, categoryId, newInfo) {
 	try {
-
+		return await userCategoriesModel.updateCategory(userId, categoryId, newInfo);
 	} catch (error) {
 		throw error
 	}
 }
 
-async function deleteCategory(userId, categoryCode) {
+async function deleteCategory(userId, categoryId) {
 	try {
-
+		return await userCategoriesModel.deleteCategory(userId, categoryId);
 	} catch (error) {
 		throw error
 	}
