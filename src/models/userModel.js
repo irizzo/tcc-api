@@ -1,6 +1,6 @@
 const { db } = require('../firebaseConfig');
 
-const userCategoriesModel = require('./userCategoriesModel');
+const userCategoriesService = require('../services/userCategoriesService');
 
 const usersCollectionRef = db.collection('users');
 
@@ -10,7 +10,7 @@ async function createDbUser(user) {
 	const userRef = await usersCollectionRef.add(user);
 	const createdUserId = userRef.id;
 
-	await userCategoriesModel.createUserDefaultCategories(createdUserId);
+	await userCategoriesService.createUserDefaultCategories(createdUserId);
 
 	return createdUserId;
 }

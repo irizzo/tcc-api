@@ -154,7 +154,7 @@ async function updateEvent(req, res) {
 			return;
 		}
 
-		// sanitization
+		// TODO: review sanitization
 		const cleanEventInfo = {};
 		const { title, description, categoryCode } = req.body;
 
