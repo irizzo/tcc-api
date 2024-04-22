@@ -2,23 +2,19 @@ const userModel = require('../models/userModel');
 const userCategoriesService = require('../services/userCategoriesService');
 
 const { titleValidation } = require('../resources/validations');
-const { sanitizeString } = require('../resources/sanitization');
+const { sanitizeString, sanitizeCodeString } = require('../resources/sanitization');
 const generateIdentifierCode = require('../resources/generateIdentifier');
 
 // TODO: get from user session
 const userId = "stQM4UlD6n6c6h9Lmi7w";
 
-async function createCategory(req, res) {
-	console.log('[createCategory] (controller)');
+async function createNewCategory(req, res) {
+	console.log('[createNewCategory] (controller)');
 
 	try {
 		const { title, description } = req.body;
 		
-		// TODO: get user session
-		// TODO: validate user session
-		// TODO: if user session is not valid, redirect to log in
-		// TODO: if session is valid, get userId
-		// const { userId } = req.session;
+		// TODO: get userId from session
 
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
@@ -31,13 +27,13 @@ async function createCategory(req, res) {
 			})
 		}
 
-		let cleanCategory = { };
-
-		cleanCategory.title = sanitizeString(title);
-		cleanCategory.description = sanitizeString(description);
+		const cleanCategoryInfo = {
+			title: sanitizeString(title),
+			description: sanitizeString(description),
+		};
 
 		// validation
-		if (!titleValidation(cleanCategory.title)) {
+		if (!titleValidation(cleanCategoryInfo.title)) {
 			res.status(400).send({
 				code: 'INVALID_TITLE',
 				result: null,
@@ -47,12 +43,13 @@ async function createCategory(req, res) {
 			return;
 		};
 		
-		cleanCategory.code = generateIdentifierCode(cleanCategory.title);
+		cleanCategoryInfo.code = generateIdentifierCode(cleanCategoryInfo.title);
 
-		// create on DB
-		const createdCategoryRes = await userCategoriesService.createNewCategory(userId, cleanCategory);
+		// TODO: check if categoryCode is valid!
 
-		console.log(`cleanCategory = ${JSON.stringify(cleanCategory)}`);
+		const createdCategoryRes = await userCategoriesService.createNewCategory(userId, cleanCategoryInfo);
+
+		console.log(`cleanCategoryInfo = ${JSON.stringify(cleanCategoryInfo)}`);
 		
 		res.status(201).send({
 			code: 'CREATED_CATEGORY',
@@ -73,11 +70,7 @@ async function getAllCategories(req, res) {
 	console.log('[getAllCategories] (controller)');
 
 	try {
-		// TODO: get user session
-		// TODO: validate user session
-		// TODO: if user session is not valid, redirect to log in
-		// TODO: if session is valid, get userId
-		// const { userId } = req.session;
+		// TODO: user session
 
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
@@ -90,6 +83,7 @@ async function getAllCategories(req, res) {
 			})
 		}
 
+		// TODO: get directly from user (above)
 		const categoriesList = await userCategoriesService.getAllUserCategories(userId);
 
 		res.status(200).send({
@@ -112,11 +106,7 @@ async function getCategoryByCode(req, res) {
 
 	try {
 		// TODO: get user session
-		// TODO: validate user session
-		// TODO: if user session is not valid, redirect to log in
-		// TODO: if session is valid, get userId
-		// const { userId } = req.session;
-		
+
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
 		
@@ -126,12 +116,13 @@ async function getCategoryByCode(req, res) {
 				result: null,
 				success: false
 			})
-		} else console.log('found user')
+		} 
 		
 		const { categoryCode } = req.params;
+		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
-		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, categoryCode);
-
+		// TODO: get directly from user (above)
+		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
 		if (!foundCategoryInfo) {
 			res.status(404).send({
 				code: 'CATEGORY_NOT_FOUND',
@@ -161,11 +152,7 @@ async function updateCategory(req, res) {
 	console.log('[updateCategory] (controller)');
 
 	try {
-		// TODO: get user session
-		// TODO: validate user session
-		// TODO: if user session is not valid, redirect to log in
-		// TODO: if session is valid, get userId
-		// const { userId } = req.session;
+		// TODO: user session
 
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
@@ -176,12 +163,13 @@ async function updateCategory(req, res) {
 				result: null,
 				success: false
 			})
-		} else console.log('found user')
+		} 
 
 		const { categoryCode } = req.params;
+		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
-		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, categoryCode);
-
+		// TODO: get directly from user (above)
+		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
 		if (foundCategoryInfo.length === 0) {
 			res.status(404).send({
 				code: 'CATEGORY_NOT_FOUND',
@@ -196,15 +184,8 @@ async function updateCategory(req, res) {
 
 		let cleanCategoryInfo = {};
 
-		if(title.length > 0) {
-			cleanCategoryInfo.title = sanitizeString(title);
-		}
-
-		if(description.length > 0) {
-			cleanCategoryInfo.description = sanitizeString(description);
-		}
-
-		console.log(`cleanCategoryInfo = ${JSON.stringify(cleanCategoryInfo)}`);
+		if (title !== null) cleanTaskInfo.title = sanitizeString(title);
+		if (description !== null) cleanTaskInfo.description = sanitizeString(description);
 
 		const categoryId = foundCategoryInfo[0].id;
 
@@ -230,10 +211,6 @@ async function deleteCategory(req, res) {
 
 	try {
 		// TODO: get user session
-		// TODO: validate user session
-		// TODO: if user session is not valid, redirect to log in
-		// TODO: if session is valid, get userId
-		// const { userId } = req.session;
 
 		// validate userId
 		const userExists = await userModel.findUserById(userId);
@@ -243,12 +220,13 @@ async function deleteCategory(req, res) {
 				result: null,
 				success: false
 			})
-		} else console.log('found user');
+		} ;
 
 		const { categoryCode } = req.params;
+		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
-		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, categoryCode);
-
+		// TODO: get directly from user (above)
+		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
 		if (foundCategoryInfo.length === 0) {
 			res.status(404).send({
 				code: 'CATEGORY_NOT_FOUND',
@@ -260,9 +238,7 @@ async function deleteCategory(req, res) {
 		}
 
 		const categoryId = foundCategoryInfo[0].id;
-
-		const deletedCategory = await userCategoriesService.deleteCategory(userId, categoryId);
-		console.log(`deletedCategory = ${deletedCategory}`);
+		await userCategoriesService.deleteCategory(userId, categoryId);
 
 		res.status(200).send({
 			code: 'DELETED_CATEGORY',
@@ -280,7 +256,7 @@ async function deleteCategory(req, res) {
 }
 
 module.exports = {
-	createCategory,
+	createNewCategory,
 	getAllCategories,
 	getCategoryByCode,
 	updateCategory,
