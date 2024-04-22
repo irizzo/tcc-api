@@ -1,4 +1,4 @@
-const { findPriorityByCode } = require('../../models/priorityModel');
+const { getPriorityByCode } = require('../../services/priorityService');
 const { findStatusByCode } = require('../../models/statusModel');
 
 function dueDateValidation(date) {
@@ -60,12 +60,13 @@ function passwordValidation(password) {
 	return true;
 }
 
+// TODO: review
 async function priorityCodeValidation(priorityCode) {
 	if (!priorityCode || priorityCode.length == 0) {
 		return true
 	}
 
-	const codeMatch = await findPriorityByCode(priorityCode);
+	const codeMatch = await getPriorityByCode(priorityCode);
 
 	if(!codeMatch || codeMatch.length === 0) {
 		return false
@@ -86,7 +87,7 @@ async function categoryCodeValidation(categoryCode) {
 }
 
 async function statusCodeValidation(statusCode) {
-	const codeMatch = await findPriorityByCode(statusCode);
+	// const codeMatch = await findPriorityByCode(statusCode);
 
 	if (!codeMatch || codeMatch.length === 0) {
 		return false

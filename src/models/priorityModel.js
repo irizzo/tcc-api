@@ -37,7 +37,8 @@ async function findPriorityByCode(code) {
 		});
 	});
 
-	return matchList;
+	// the priority's code must be unique so there's only going to be 1 instance in the match list
+	return matchList[0]; 
 }
 
 module.exports = {
