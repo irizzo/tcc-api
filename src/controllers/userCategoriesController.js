@@ -2,7 +2,7 @@ const userCategoriesModel = require('../models/userCategoriesModel');
 const userModel = require('../models/userModel');
 
 const { titleValidation } = require('../resources/validations');
-const { sanitizeString } = require('../resources/sanitization');
+const { generalSanitization } = require('../resources/sanitization');
 const generateIdentifierCode = require('../resources/generateIdentifier');
 
 // TODO: get from user session
@@ -33,8 +33,8 @@ async function createCategory(req, res) {
 
 		let cleanCategory = { };
 
-		cleanCategory.title = sanitizeString(title);
-		cleanCategory.description = sanitizeString(description);
+		cleanCategory.title = generalSanitization(title);
+		cleanCategory.description = generalSanitization(description);
 
 		// validation
 		if (!titleValidation(cleanCategory.title)) {
@@ -197,11 +197,11 @@ async function updateCategory(req, res) {
 		let cleanCategoryInfo = {};
 
 		if(title.length > 0) {
-			cleanCategoryInfo.title = sanitizeString(title);
+			cleanCategoryInfo.title = generalSanitization(title);
 		}
 
 		if(description.length > 0) {
-			cleanCategoryInfo.description = sanitizeString(description);
+			cleanCategoryInfo.description = generalSanitization(description);
 		}
 
 		console.log(`cleanCategoryInfo = ${JSON.stringify(cleanCategoryInfo)}`);

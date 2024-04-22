@@ -2,7 +2,7 @@ const userModel = require('../models/userModel');
 
 // resources
 const { encrypt, compare } = require('../resources/cryptography'); 
-const { sanitizeString, sanitizeEmail } = require('../resources/sanitization');
+const { generalSanitization } = require('../resources/sanitization');
 const { emailValidation, passwordValidation } = require('../resources/validations');
 
 async function getUserByEmail(userEmail) {
@@ -25,10 +25,10 @@ async function createUser(req, res) {
 			password: ''
 		};
 
-		cleanUser.firstName = sanitizeString(firstName);
-		cleanUser.lastName = sanitizeString(lastName);
-		cleanUser.password = sanitizeString(password);
-		cleanUser.email = sanitizeEmail(email);
+		cleanUser.firstName = generalSanitization(firstName);
+		cleanUser.lastName = generalSanitization(lastName);
+		cleanUser.password = generalSanitization(password);
+		cleanUser.email = generalSanitization(email);
 
 		// validations
 		if (!cleanUser.firstName || !cleanUser.lastName || !cleanUser.email || !cleanUser.password) {
@@ -110,8 +110,8 @@ async function login(req, res) {
 			password: ''
 		}
 
-		cleanLogInInfo.password = sanitizeString(password);
-		cleanLogInInfo.email = sanitizeEmail(email);
+		cleanLogInInfo.password = generalSanitization(password);
+		cleanLogInInfo.email = generalSanitization(email);
 
 		// validations
 		if (!cleanLogInInfo.email || !cleanLogInInfo.password) {

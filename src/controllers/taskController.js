@@ -4,7 +4,7 @@ const taskService = require('../services/taskService');
 
 // resources
 const { dueDateValidation, titleValidation, categoryCodeValidation, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
-const { sanitizeString, sanitizeCodeString } = require('../resources/sanitization');
+const { generalSanitization } = require('../resources/sanitization');
 
 // TODO: get from user session
 const userId = "stQM4UlD6n6c6h9Lmi7w";
@@ -19,12 +19,12 @@ async function createNewTask(req, res) {
 
 		// sanitization
 		const cleanTaskInfo = {
-			title: sanitizeString(title),
-			description: description === null ? null : sanitizeString(description),
+			title: generalSanitization(title),
+			description: description === null ? null : generalSanitization(description),
 			dueDate: dueDate === null ? null : new Date(dueDate),  // TODO: handle date https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
 			toDoDate: toDoDate === null ? null : new Date(toDoDate),
-			categoryCode: categoryCode === null ? null : sanitizeCodeString(categoryCode),
-			priorityCode: priorityCode === null ? null : sanitizeCodeString(priorityCode)
+			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode),
+			priorityCode: priorityCode === null ? null : generalSanitization(priorityCode)
 		}
 
 		// validation
@@ -135,12 +135,12 @@ async function updateTaskInfo(req, res) {
 		// sanitization
 		const cleanTaskInfo = {};
 
-		if (title !== null) cleanTaskInfo.title = sanitizeString(title);
-		if (description !== null) cleanTaskInfo.description = sanitizeString(description);
+		if (title !== null) cleanTaskInfo.title = generalSanitization(title);
+		if (description !== null) cleanTaskInfo.description = generalSanitization(description);
 		if (dueDate !== null) cleanTaskInfo.dueDate = new Date(dueDate);
 		if (toDoDate !== null) cleanTaskInfo.toDoDate = new Date(toDoDate);
-		if (categoryCode !== null) cleanTaskInfo.categoryCode = sanitizeCodeString(categoryCode);
-		if (priorityCode !== null) cleanTaskInfo.priorityCode = sanitizeCodeString(priorityCode);;
+		if (categoryCode !== null) cleanTaskInfo.categoryCode = generalSanitization(categoryCode);
+		if (priorityCode !== null) cleanTaskInfo.priorityCode = generalSanitization(priorityCode);;
 
 		// validations
 		if (cleanTaskInfo.title && !titleValidation(cleanTaskInfo.title)) {
