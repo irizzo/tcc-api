@@ -2,39 +2,7 @@ const { db } = require('../firebaseConfig');
 
 const usersCollectionRef = db.collection('users');
 
-const defaultCategories = [
-	{
-		title: "Trabalho",
-		description: "Tarefas relacionas a trabalho.",
-		code: "WORK",
-	},
-	{
-		title: "Acadêmico",
-		description: "Tarefas relacionadas a estudos, à escola ou faculdade.",
-		code: "ACADEMIC"
-	},
-	{
-		title: "Social",
-		description: "Tarefas relacionadas ao social, lazer etc",
-		code: "SOCIAL",
-	}
-]
-
-async function createUserDefaultCategories(userId) {
-	console.log(`[createUserDefaultCategories] (model)`);
-
-	console.log(`userId = ${userId}`);
-
-	defaultCategories.forEach(async (cat) => {
-		console.log(`categoryInfo = ${JSON.stringify(cat)}`);
-
-		await usersCollectionRef.doc(userId).collection('categories').add(cat);
-	})
-
-	return;
-}
-
-async function createDbCategory(userId,category) {
+async function createDbCategory(userId, category) {
 	console.log('[createDbCategory] (model)');
 	
 	const categoryRef = await usersCollectionRef.doc(userId).collection('categories').add(category);

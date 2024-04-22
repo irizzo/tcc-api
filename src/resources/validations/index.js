@@ -1,5 +1,5 @@
-const { findPriorityByCode } = require('../../models/priorityModel');
-const { findStatusByCode } = require('../../models/statusModel');
+const { getPriorityByCode } = require('../../services/priorityService');
+const { getStatusByCode } = require('../../services/statusService');
 
 // TODO: general validation based on the xss pkg
 
@@ -58,12 +58,13 @@ function passwordValidation(password) {
 	return true;
 }
 
+// TODO: review
 async function priorityCodeValidation(priorityCode) {
 	if (!priorityCode || priorityCode.length == 0) {
 		return true
 	}
 
-	const codeMatch = await findPriorityByCode(priorityCode);
+	const codeMatch = await getPriorityByCode(priorityCode);
 
 	if(!codeMatch || codeMatch.length === 0) {
 		return false
@@ -83,13 +84,15 @@ async function categoryCodeValidation(categoryCode) {
 	return true;
 }
 
+// TODO: review
 async function statusCodeValidation(statusCode) {
-	const codeMatch = await findPriorityByCode(statusCode);
+	const codeMatch = await getStatusByCode(statusCode);
 
-	if (!codeMatch || codeMatch.length === 0) {
+	if (codeMatch.length === 0) {
 		return false
 	}
 
+	console.log(`codeMatch = ${JSON.stringify(codeMatch)}`);
 	return true;
 }
 
