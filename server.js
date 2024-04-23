@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 
 // user routes
 app.post('/create-user', userController.createNewUser);
-// app.post('/login', userController.login);
+app.post('/login', userController.userLogin);
 
 // task routes
 app.get('/tasks', taskController.getAllTasks); // list all tasks

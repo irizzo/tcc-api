@@ -15,6 +15,7 @@ exports.createNewUser = async (newUserInfo) => {
 		const createdUserId = await userModel.createDbUser(userInfo);
 		const generatedJwtToken = userAuth.generateTokenFromUserId(createdUserId);
 		await createUserDefaultCategories(createdUserId);
+		await userModel.updateDbUser(createdUserId, { jwt: generatedJwtToken});
 
 		return { createdUserId, generatedJwtToken }
 
@@ -24,8 +25,31 @@ exports.createNewUser = async (newUserInfo) => {
 }
 
 exports.getUserByEmail = async (email) => {
+	console.log('[getUserByEmail] (service)');
 	try {
 		return await userModel.findUserByEmail(email);
+	} catch (error) {
+		throw error;
+	}
+}
+
+exports.updateUserInfo = async (userId, newInfo) => {
+	console.log('[updateUserInfo] (service)');
+	try {
+		const updatedInfo = { ...newInfo, updatedAt: new Date(Date.now())}
+		await userModel.updateDbUser(userId, updatedInfo);
+	} catch (error) {
+		throw error;
+	}
+}
+
+exports.login = async (userInfo) => {
+	console.log('[login] (service)');
+	try {
+		console.log(`userInfo = ${JSON.stringify(userInfo)}`);
+		const generatedJwtToken = userAuth.generateTokenFromUserId(userInfo.id);
+		await userModel.updateDbUser(userInfo.id, { jwt: generatedJwtToken });
+		return generatedJwtToken;
 	} catch (error) {
 		throw error;
 	}

@@ -85,93 +85,80 @@ async function createNewUser(req, res) {
 	}
 }
 
-// async function login(req, res) {
-// 	try {
-// 		console.log('[logInUser]');
+async function userLogin(req, res) {
+	try {
+		console.log('[logInUser]');
 
-// 		const { email, password } = req.body;
+		const { email, password } = req.body;
 
-// 		// sanitization 
-// 		const cleanLogInInfo = {
-// 			email: '',
-// 			password: ''
-// 		}
-
-// 		cleanLogInInfo.password = generalSanitization(password);
-// 		cleanLogInInfo.email = generalSanitization(email);
-
-// 		// validations
-// 		if (!cleanLogInInfo.email || !cleanLogInInfo.password) {
-// 			res.status(400).send({
-// 				code: 'EMPTY_FIELD',
-// 				result: null,
-// 				success: false
-// 			});
-
-// 			return;
-// 		};
-
-// 		// if (!passwordValidation(cleanLogInInfo.password)) {
-// 		// 	res.status(400).send({
-// 		// 		code: 'INVALID_PASSWORD',
-// 		// 		result: null,
-// 		// 		success: false
-// 		// 	});
-
-// 		// 	return;
-// 		// }
-
-// 		if (!emailValidation(cleanLogInInfo.email)) {
-// 			res.status(400).send({
-// 				code: 'INVALID_EMAIL',
-// 				result: null,
-// 				success: false
-// 			});
-
-// 			return;
-// 		}
-
-// 		const emailMatchList = await getUserByEmail(cleanLogInInfo.email);
-// 		if (emailMatchList.length === 0) {
-// 			res.status(400).send({
-// 				code: 'EMAIL_NOT_REGISTERED',
-// 				result: null,
-// 				success: false
-// 			});
-
-// 			return;
-// 		}
-
-// 		console.log(`emailMatchList = ${JSON.stringify(emailMatchList)}`);
-
-// 		if (!compare(cleanLogInInfo.password, emailMatchList[0].password)) {
-// 			res.status(400).send({
-// 				code: 'INCORRECT_PASSWORD',
-// 				result: null,
-// 				success: false
-// 			});
-
-// 			return;
-// 		}
-
-// 		// Log in user
-
-// 		res.status(200).send({
-// 			code: 'USER_LOGGED_IN',
-// 			result: null,
-// 			success: true
-// 		});
+		// sanitization 
+		const cleanLogInInfo = {
+			password: generalSanitization(password),
+			email: generalSanitization(email)
+		}
 		
-// 	} catch (error) {
-// 		console.log(`ERROR: ${error}`);
-// 		res.status(500).send({
-// 			code: 'INTERNAL_ERROR',
-// 			result: error,
-// 			success: false
-// 		});
-// 	}
-// }
+		// validations
+		if (!passwordValidation(cleanLogInInfo.password)) {
+			res.status(400).send({
+				code: 'INVALID_PASSWORD',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+
+		if (!emailValidation(cleanLogInInfo.email)) {
+			res.status(400).send({
+				code: 'INVALID_EMAIL',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+
+		const emailMatchList = await userService.getUserByEmail(cleanLogInInfo.email);
+		if (emailMatchList.length === 0) {
+			res.status(400).send({
+				code: 'EMAIL_NOT_REGISTERED',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+		
+		if (!comparePlainAndHash(cleanLogInInfo.password, emailMatchList[0].password)) {
+			res.status(400).send({
+				code: 'INCORRECT_PASSWORD',
+				result: null,
+				success: false
+			});
+
+			return;
+		}
+
+		// Log in user
+		const loginInfo = await userService.login(emailMatchList[0]);
+
+		res.status(200).send({
+			code: 'USER_LOGGED_IN',
+			result: loginInfo,
+			success: true
+		});
+		
+	} catch (error) {
+		console.log(`ERROR: ${error}`);
+		res.status(500).send({
+			code: 'INTERNAL_ERROR',
+			result: error,
+			success: false
+		});
+	}
+}
 
 module.exports = {
-	createNewUser
+	createNewUser,
+	userLogin,
 }

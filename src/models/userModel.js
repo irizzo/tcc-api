@@ -61,9 +61,16 @@ async function findUserById(userId) {
 	return true
 }
 
+async function updateDbUser(userId, updatedInfo) {
+	console.log('[updateUser] (model)');
+	const userRef = usersCollectionRef.doc(userId);
+	await userRef.update(updatedInfo);
+}
+
 module.exports = {
 	createDbUser,
 	getAllDbUsers,
 	findUserByEmail,
 	findUserById,
+	updateDbUser
 };
