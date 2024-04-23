@@ -1,14 +1,14 @@
 require('dotenv/config');
-require('./src/firebaseConfig.js');
+require('./src/firebaseConfig');
 
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const userController = require('./src/controllers/userController.js');
-const taskController = require('./src/controllers/taskController.js');
-const userCategoriesController = require('./src/controllers/userCategoriesController.js');
-const eventController = require('./src/controllers/eventController.js');
+const userController = require('./src/controllers/userController');
+const taskController = require('./src/controllers/taskController');
+const userCategoriesController = require('./src/controllers/userCategoriesController');
+const eventController = require('./src/controllers/eventController');
 
 const app = express();
 const port = 8080;
@@ -22,8 +22,8 @@ app.get('/', (req, res) => {
 });
 
 // user routes
-app.post('/create-user', userController.createUser);
-app.post('/login', userController.login);
+app.post('/create-user', userController.createNewUser);
+app.post('/login', userController.userLogin);
 
 // task routes
 app.get('/tasks', taskController.getAllTasks); // list all tasks
@@ -35,7 +35,7 @@ app.delete('/tasks/:taskId', taskController.deleteTask) // detele an existing ta
 
 // category routes
 app.get('/categories', userCategoriesController.getAllCategories); // list all categories
-app.post('/categories', userCategoriesController.createCategory); // create new category
+app.post('/categories', userCategoriesController.createNewCategory); // create new category
 
 app.get('/categories/:categoryCode', userCategoriesController.getCategoryByCode); // get category details 
 app.put('/categories/:categoryCode', userCategoriesController.updateCategory);

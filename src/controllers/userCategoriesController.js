@@ -48,8 +48,6 @@ async function createNewCategory(req, res) {
 		// TODO: check if categoryCode is valid!
 
 		const createdCategoryRes = await userCategoriesService.createNewCategory(userId, cleanCategoryInfo);
-
-		console.log(`cleanCategoryInfo = ${JSON.stringify(cleanCategoryInfo)}`);
 		
 		res.status(201).send({
 			code: 'CREATED_CATEGORY',
@@ -58,6 +56,7 @@ async function createNewCategory(req, res) {
 		});
 
 	} catch (error) {
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -93,6 +92,7 @@ async function getAllCategories(req, res) {
 		});
 
 	} catch (error) {
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -140,6 +140,7 @@ async function getCategoryByCode(req, res) {
 		});
 
 	} catch (error) {
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -198,6 +199,7 @@ async function updateCategory(req, res) {
 		});
 
 	} catch (error) {
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -247,6 +249,7 @@ async function deleteCategory(req, res) {
 		});
 		
 	} catch (error) {
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,

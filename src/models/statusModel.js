@@ -26,7 +26,6 @@ async function findStatusByCode(code) {
 	const matchList = [];
 
 	if (snapshot.empty) {
-		console.log('No matches found');
 		return [];
 	}
 

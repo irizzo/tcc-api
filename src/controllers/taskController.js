@@ -11,8 +11,8 @@ const userId = "stQM4UlD6n6c6h9Lmi7w";
 
 async function createNewTask(req, res) {
 	console.log('[createNewTaskController]');
+	
 	try {
-
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 
 		// TODO: userSession
@@ -72,7 +72,7 @@ async function createNewTask(req, res) {
 		});
 
 	} catch (error) {
-		console.log(`ERROR: ${error}`);
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -91,7 +91,7 @@ async function getAllTasks(req, res) {
 		res.status(200).send({ code: 'OK', result: tasksList, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${error}`);
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }
@@ -112,7 +112,7 @@ async function getTaskDetails(req, res) {
 		res.status(200).send({ code: 'OK', result: foundTask.data(), success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${error}`);
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }
@@ -178,7 +178,7 @@ async function updateTaskInfo(req, res) {
 		res.status(200).send({ code: 'UPDATED_TASK', result: null, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${error}`);
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }
@@ -201,7 +201,7 @@ async function deleteTask(req, res) {
 		res.status(200).send({ code: 'DELETED_TASK', result: null, success: true });
 	
 	} catch (error) {
-		console.log(`ERROR = ${error}`);
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }

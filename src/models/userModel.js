@@ -1,7 +1,5 @@
 const { db } = require('../firebaseConfig');
 
-const userCategoriesService = require('../services/userCategoriesService');
-
 const usersCollectionRef = db.collection('users');
 
 async function createDbUser(user) {
@@ -9,8 +7,6 @@ async function createDbUser(user) {
 
 	const userRef = await usersCollectionRef.add(user);
 	const createdUserId = userRef.id;
-
-	await userCategoriesService.createUserDefaultCategories(createdUserId);
 
 	return createdUserId;
 }
@@ -39,7 +35,6 @@ async function findUserByEmail(email) {
 	const matchList = [];
 
 	if (snapshot.empty) {
-		console.log('No email matches found');
 		return [];
 	}
 
@@ -65,34 +60,16 @@ async function findUserById(userId) {
 	return true
 }
 
-async function addEventRef(userId, eventId) {
-	console.log('[addEventRef] (model)');
-	let updatedEventsList = [];
-
+async function updateDbUser(userId, updatedInfo) {
+	console.log('[updateUser] (model)');
 	const userRef = usersCollectionRef.doc(userId);
-	const userMatch = await userRef.get();
-	const eventsList = userMatch.data().events;
-
-	if(eventsList.length !== 0) {
-		if (!eventsList.includes(eventId)) {
-			updatedEventsList = eventsList.concat(eventId);
-		}
-	} else {
-		updatedEventsList.push(eventId);
-	}
-
-	if(updatedEventsList.length !== 0) {
-		await userRef.update({ events: updatedEventsList});
-	}
-	
-	return;
+	await userRef.update(updatedInfo);
 }
-
 
 module.exports = {
 	createDbUser,
 	getAllDbUsers,
 	findUserByEmail,
 	findUserById,
-	addEventRef
+	updateDbUser
 };

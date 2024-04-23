@@ -26,7 +26,6 @@ async function findPriorityByCode(code) {
 	const matchList = [];
 
 	if (snapshot.empty) {
-		console.log('No matches found');
 		return [];
 	}
 

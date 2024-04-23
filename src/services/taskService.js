@@ -6,13 +6,12 @@ async function createNewTask(userId, newTaskInfo) {
 		const taskInfo = { 
 			...newTaskInfo, 
 			statusCode: 'NOT_STARTED', 
-			createdAt: Date.now(),
-			updatedAt: Date.now(),
+			createdAt:  new Date(Date.now()),
+			updatedAt:  new Date(Date.now()),
 			userId
 		};
 
 		const createdTaskId = await taskModel.createDbTask(taskInfo);
-		// TODO: addTaskRef await userModel.addTaskRef(userId, createdTaskId); 
 
 		return createdTaskId;
 	} catch (error) {
@@ -46,7 +45,7 @@ async function getUserTaskById(taskId) {
 async function updateTaskInfo(taskId, newInfo) {
 	console.log('[updateTaskInfo] (service)');
 	try {
-		const updatedInfo = { ...newInfo, updatedAt: Date.now() };
+		const updatedInfo = { ...newInfo, updatedAt: new Date(Date.now()) };
 		await taskModel.updateTask(taskId, updatedInfo);
 		return;
 
