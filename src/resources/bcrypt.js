@@ -1,5 +1,3 @@
-require('dotenv/config');
-
 const bcrypt = require('bcryptjs');
 const salt = process.env.HASH_SALT;
 
