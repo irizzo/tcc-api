@@ -54,7 +54,6 @@ async function createNewUser(req, res) {
 
 		// email must be unique
 		const emailMatchList = await userService.getUserByEmail(cleanUser.email);
-		console.log(`emailMatchList = ${JSON.stringify(emailMatchList)}`)
 		if(emailMatchList.length > 0) {
 			res.status(400).send({
 				code: 'EMAIL_NOT_UNIQUE',
@@ -76,7 +75,7 @@ async function createNewUser(req, res) {
 		});
 		
 	} catch (error) {
-		console.log(`ERROR: ${error}`);
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -149,7 +148,7 @@ async function userLogin(req, res) {
 		});
 		
 	} catch (error) {
-		console.log(`ERROR: ${error}`);
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,

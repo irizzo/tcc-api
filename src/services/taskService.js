@@ -12,7 +12,6 @@ async function createNewTask(userId, newTaskInfo) {
 		};
 
 		const createdTaskId = await taskModel.createDbTask(taskInfo);
-		// TODO: addTaskRef await userModel.addTaskRef(userId, createdTaskId); 
 
 		return createdTaskId;
 	} catch (error) {

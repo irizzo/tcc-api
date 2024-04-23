@@ -20,7 +20,6 @@ async function getUserTasks(userId) {
 	const matchList = [];
 
 	if (snapshot.empty) {
-		console.log('No tasks found');
 		return [];
 	}
 

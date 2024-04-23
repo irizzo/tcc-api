@@ -32,7 +32,6 @@ async function getCategoryByCode(userId, categoryCode) {
 	const snapshot = await usersCollectionRef.doc(userId).collection('categories').where('code', '==', categoryCode).get();
 
 	if (snapshot.empty) {
-		console.log('No matches found');
 		return [];
 	}
 
@@ -50,10 +49,7 @@ async function deleteCategory(userId, categoryId) {
 	console.log('[deleteCategory] (model)');
 
 	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
-	const deleteRes = await categoryRef.delete();
-
-	console.log(`deleteRes = ${deleteRes}`);
-	return deleteRes;
+	await categoryRef.delete();
 }
 
 async function updateCategory(userId, categoryId, newInfo) {

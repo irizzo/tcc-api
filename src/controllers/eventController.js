@@ -53,7 +53,6 @@ async function createNewEvent(req, res) {
 
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }
@@ -68,7 +67,6 @@ async function getUserEvents(req, res) {
 		const userExists = await userModel.findUserById(userId);
 
 		if (!userExists) {
-			console.log(`invalid user ID`);
 			res.status(400).send({
 				code: 'INVALID_USER_ID',
 				result: null,
@@ -82,7 +80,7 @@ async function getUserEvents(req, res) {
 		
 	} catch (error) {
 
-		console.log(`ERROR = ${error}`);
+		console.log(`ERROR = ${JSON.stringify(error)}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }
@@ -129,7 +127,6 @@ async function updateEventDates(req, res) {
 
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }
@@ -191,7 +188,6 @@ async function updateEvent(req, res) {
 
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }
@@ -220,7 +216,6 @@ async function deleteEvent(req, res) {
 		res.status(200).send({ code: 'DELETED_EVENT', result: null, success: true });
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
 		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }

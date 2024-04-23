@@ -38,6 +38,7 @@ exports.updateUserInfo = async (userId, newInfo) => {
 	try {
 		const updatedInfo = { ...newInfo, updatedAt: new Date(Date.now())}
 		await userModel.updateDbUser(userId, updatedInfo);
+		
 	} catch (error) {
 		throw error;
 	}
@@ -46,10 +47,10 @@ exports.updateUserInfo = async (userId, newInfo) => {
 exports.login = async (userInfo) => {
 	console.log('[login] (service)');
 	try {
-		console.log(`userInfo = ${JSON.stringify(userInfo)}`);
 		const generatedJwtToken = userAuth.generateTokenFromUserId(userInfo.id);
 		await userModel.updateDbUser(userInfo.id, { jwt: generatedJwtToken });
 		return generatedJwtToken;
+
 	} catch (error) {
 		throw error;
 	}

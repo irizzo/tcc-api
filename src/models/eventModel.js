@@ -18,7 +18,6 @@ async function getUserEvents(userId) {
 	const matchList = [];
 
 	if (snapshot.empty) {
-		console.log('No events found');
 		return [];
 	}
 

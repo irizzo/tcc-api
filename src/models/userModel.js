@@ -35,7 +35,6 @@ async function findUserByEmail(email) {
 	const matchList = [];
 
 	if (snapshot.empty) {
-		console.log('No email matches found');
 		return [];
 	}
 
