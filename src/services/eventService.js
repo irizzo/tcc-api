@@ -1,19 +1,16 @@
 const eventModel = require('../models/eventModel');
-const userModel = require('../models/userModel');
 
 async function createNewEvent(userId, newEventInfo) {
 	console.log('[createNewEvent] (service)');
 	try {
 		const eventInfo = {
 			...newEventInfo,
-			createdAt: Date.now(), 
-			updatedAt: Date.now(),
+			createdAt:  new Date(Date.now()), 
+			updatedAt:  new Date(Date.now()),
 			userId
 		};
 
 		const createdEventId = await eventModel.createDbEvent(eventInfo);
-		await userModel.addEventRef(userId, createdEventId);
-
 		return createdEventId;
 	} catch (error) {
 		console.log(`(service) error = ${error} `);
@@ -46,7 +43,7 @@ async function getUserEventById(eventId) {
 async function updateEventDates(eventId, newInfo) {
 	console.log('[updateEventDates] (service)');
 	try {
-		const updatedInfo = { ...newInfo, updatedAt: Date.now() };
+		const updatedInfo = { ...newInfo, updatedAt:  new Date(Date.now()) };
 	  await eventModel.updateEvent(eventId, updatedInfo);
 		return;
 
@@ -58,7 +55,7 @@ async function updateEventDates(eventId, newInfo) {
 async function updateEventInfo(eventId, newInfo) {
 	console.log('[updateEventInfo] (service)');
 	try {
-		const updatedInfo = { ...newInfo, updatedAt: Date.now() };
+		const updatedInfo = { ...newInfo, updatedAt:  new Date(Date.now()) };
 		await eventModel.updateEvent(eventId, updatedInfo);
 		return;
 

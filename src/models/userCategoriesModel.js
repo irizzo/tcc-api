@@ -65,7 +65,6 @@ async function updateCategory(userId, categoryId, newInfo) {
 }
 
 module.exports = {
-	createUserDefaultCategories,
 	createDbCategory,
 	getAllDbCategories,
 	getCategoryByCode,
