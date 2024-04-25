@@ -43,9 +43,16 @@ exports.findDbRoutineById = async (routineId) => {
 
 exports.updateDbRoutine = async (routineId, updatedInfo) => {
 	console.log('[updateDbRoutine]');
-	const routineRef = routinesCollectionRef.doc(routineId);
-	const updateRes = await routineRef.update(updatedInfo);
-	return updateRes;
+	try {
+		const routineRef = routinesCollectionRef.doc(routineId);
+
+		const updateRes = await routineRef.update(updatedInfo);
+		console.log(`updateRes = ${JSON.stringify(updateRes)}`);
+		return updateRes;		
+
+	} catch (error) {
+		throw error
+	}
 }
 
 exports.deleteDbRoutine = async (routineId) => {

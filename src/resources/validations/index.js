@@ -139,5 +139,5 @@ module.exports = {
 	categoryCodeValidation,
 	statusCodeValidation,
 	routineTimeValidation,
-	routineActiveTimeValidation
+	routineActiveTimeValidation,
 };

@@ -40,7 +40,7 @@ exports.updateRoutineDetails = async (routineId, newInfo) => {
 	console.log('[updateRoutineDetails] (service)');
 	try {
 		const updatedInfo = { ...newInfo, updatedAt: new Date(Date.now()) };
-		await routineModel.updateEvent(routineId, updatedInfo);
+		await routineModel.updateDbRoutine(routineId, updatedInfo);
 		return;
 
 	} catch (error) {

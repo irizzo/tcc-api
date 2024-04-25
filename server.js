@@ -52,7 +52,11 @@ app.delete('/events/:eventId', eventController.deleteEvent);
 app.put('/events/:eventId/update-dates', eventController.updateEventDates);
 
 // routine routes
+app.get('/routines', routineController.getUserRoutines);
 app.post('/routines', routineController.createNewRoutine);
+
+app.get('/routines/:routineId', routineController.getRoutineDetails);
+app.put('/routines/:routineId', routineController.updateRoutineInfo);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
