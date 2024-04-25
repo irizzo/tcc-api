@@ -56,8 +56,33 @@ exports.getUserRoutines = async (req, res) => {
 	console.log('[createNewRoutine] (controller)');
 	try {
 		// user validation
-		
+
+		const routineList = await routineService.getUserRoutines(userId);
+
+		res.status(200).send({ code: 'OK', result: routineList, success: true });
 	} catch (error) {
-		
+		console.log(`ERROR = ${JSON.stringify(error)}`);
+		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+	}
+}
+
+exports.getRoutineDetails = async (req, res) => {
+	console.log('[createNewRoutine] (controller)');
+	try {
+		// user validation
+
+		const { routineId } = req.params;
+
+		const foundRoutine = await routineService.getUserRoutineById(routineId);
+		if (!foundRoutine) {
+			res.status(404).send({ code: 'ROUTINE_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
+		res.status(200).send({ code: 'OK', result: foundRoutine.data(), success: true });
+
+	} catch (error) {
+		console.log(`ERROR = ${JSON.stringify(error)}`);
+		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
 	}
 }
