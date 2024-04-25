@@ -19,7 +19,7 @@ async function createNewEvent(req, res) {
 		// sanitization
 		const cleanEventInfo = {
 			title: generalSanitization(title),
-			description: generalSanitization(description),
+			description: description === null ? null : generalSanitization(description),
 			startDate: new Date(startDate),
 			endDate: new Date(endDate),
 			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode)
