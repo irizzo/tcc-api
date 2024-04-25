@@ -96,6 +96,39 @@ async function statusCodeValidation(statusCode) {
 	return true;
 }
 
+function routineTimeValidation(timeArray) {
+	if(timeArray[0] < 0 || timeArray[0] > 23) {
+		return false
+	}
+
+	if (timeArray[1] < 0 || timeArray[1] > 59){
+		return false
+	}
+	
+	return true
+}
+
+function routineActiveTimeValidation(startTime, endTime) {
+	console.log(`startTime = ${startTime}`);
+	console.log(`endTime = ${endTime}`);
+
+	if(startTime[0] > endTime[0]) {
+		console.log('startTime[0] > endTime[0]');
+		console.log(`startTime[0] = ${startTime[0]}`);
+		console.log(`endTime[0] = ${endTime[0]}`);
+
+		return false
+	}
+
+	if(startTime[0] === endTime[0] && startTime[1] >= endTime[1]) {
+		console.log('startTime[0] === endTime[0] && startTime[1] >= endTime[1]');
+
+		return false
+	}
+
+	return true
+}
+
 module.exports = {
 	dueDateValidation,
 	endDateValidation,
@@ -104,5 +137,7 @@ module.exports = {
 	passwordValidation,
 	priorityCodeValidation,
 	categoryCodeValidation,
-	statusCodeValidation
+	statusCodeValidation,
+	routineTimeValidation,
+	routineActiveTimeValidation
 };

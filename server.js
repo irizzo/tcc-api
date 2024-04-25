@@ -9,6 +9,7 @@ const userController = require('./src/controllers/userController');
 const taskController = require('./src/controllers/taskController');
 const userCategoriesController = require('./src/controllers/userCategoriesController');
 const eventController = require('./src/controllers/eventController');
+const routineController = require('./src/controllers/routineController')
 
 const app = express();
 const port = 8080;
@@ -49,6 +50,9 @@ app.put('/events/:eventId', eventController.updateEvent);
 app.delete('/events/:eventId', eventController.deleteEvent);
 
 app.put('/events/:eventId/update-dates', eventController.updateEventDates);
+
+// routine routes
+app.post('/routines', routineController.createNewRoutine);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
