@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel');
 const userCategoriesService = require('../services/userCategoriesService');
 
-const { titleValidation } = require('../resources/validations');
+const { titleValidation, categoryCodeExists } = require('../resources/validations');
 const { generalSanitization } = require('../resources/sanitization');
 const generateIdentifierCode = require('../resources/generateIdentifier');
 
@@ -16,20 +16,9 @@ async function createNewCategory(req, res) {
 		
 		// TODO: get userId from session
 
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
-
-		if(!userExists) {
-			res.status(400).send({
-				code: 'INVALID_USER_ID',
-				result: null,
-				success: false
-			})
-		}
-
 		const cleanCategoryInfo = {
-			title: sanitizeString(title),
-			description: sanitizeString(description),
+			title: generalSanitization(title),
+			description: description === null ? null : generalSanitization(description),
 		};
 
 		// validation
@@ -45,7 +34,9 @@ async function createNewCategory(req, res) {
 		
 		cleanCategoryInfo.code = generateIdentifierCode(cleanCategoryInfo.title);
 
-		// TODO: check if categoryCode is valid!
+		if (categoryCodeExists(userId, cleanCategoryInfo.code)) {
+			res.status(400).send({ code: 'CATEGORY_ALREADY_EXISTS', result: null, success: false});
+		}
 
 		const createdCategoryRes = await userCategoriesService.createNewCategory(userId, cleanCategoryInfo);
 		
@@ -183,10 +174,10 @@ async function updateCategory(req, res) {
 
 		const { title, description } = req.body;
 
-		let cleanCategoryInfo = {};
-
-		if (title !== null) cleanTaskInfo.title = generalSanitization(title);
-		if (description !== null) cleanTaskInfo.description = generalSanitization(description);
+		let cleanCategoryInfo = {
+			title: title === null ? null : generalSanitization(title),
+			description: description === null ? null : generalSanitization(description),
+		};
 
 		const categoryId = foundCategoryInfo[0].id;
 

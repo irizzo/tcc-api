@@ -10,7 +10,7 @@ exports.createNewRoutine = async (req, res) => {
 	console.log('[createNewRoutine] (controller)');
 
 	try {
-		// validate user session
+		// TODO: validate user session
 
 		const { title, description, startOfActiveTime, endOfActiveTime } = req.body;
 		
@@ -56,7 +56,7 @@ exports.createNewRoutine = async (req, res) => {
 exports.getUserRoutines = async (req, res) => {
 	console.log('[getUserRoutines] (controller)');
 	try {
-		// user validation
+		// TODO: user validation
 
 		const routineList = await routineService.getUserRoutines(userId);
 
@@ -70,9 +70,14 @@ exports.getUserRoutines = async (req, res) => {
 exports.getRoutineDetails = async (req, res) => {
 	console.log('[getRoutineDetails] (controller)');
 	try {
-		// user validation
+		// TODO: user validation
 
 		const { routineId } = req.params;
+
+		if(!routineId) {
+			res.status(500).send({ code: 'NO_ROUTINE_ID', result: null, success: false });
+			return;
+		}
 
 		const foundRoutine = await routineService.getUserRoutineById(routineId);
 		if (!foundRoutine) {
@@ -91,7 +96,7 @@ exports.getRoutineDetails = async (req, res) => {
 exports.updateRoutineInfo = async (req, res) => {
 	console.log('[updateRoutineInfo] (controller)');
 	try {
-		// user validation
+		// TODO: user validation
 
 		const { routineId } = req.params;
 

@@ -3,7 +3,7 @@ const userModel = require('../models/userModel'); // TODO: userService
 const eventService = require('../services/eventService');
 
 const { generalSanitization } = require('../resources/sanitization');
-const { dueDateValidation, endDateValidation, titleValidation, categoryCodeValidation } = require('../resources/validations');
+const { dueDateValidation, endDateValidation, titleValidation, categoryCodeExists } = require('../resources/validations');
 
 // TODO: get from user session
 const userId = "stQM4UlD6n6c6h9Lmi7w";
@@ -41,7 +41,7 @@ async function createNewEvent(req, res) {
 			return;
 		}
 
-		if (cleanEventInfo.categoryCode && !categoryCodeValidation(userId, cleanEventInfo.categoryCode)) {
+		if (cleanEventInfo.categoryCode && !categoryCodeExists(userId, cleanEventInfo.categoryCode)) {
 			res.category(400).send({ code: 'INVALID_CATEGORY_CODE', result: null, success: false });
 			return;
 		}
@@ -88,12 +88,6 @@ async function updateEventDates(req, res) {
 	console.log('[updateEventDates] (controller)');
 	try {
 		// TODO: userSession
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
-		if (!userExists) {
-			res.status(400).send({ code: 'INVALID_USER_ID', result: null, success: false });
-			return;
-		}
 
 		const { eventId } = req.params;
 
@@ -135,12 +129,6 @@ async function updateEvent(req, res) {
 
 	try {
 		// TODO: userSession
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
-		if (!userExists) {
-			res.status(400).send({ code: 'INVALID_USER_ID', result: null, success: false });
-			return;
-		}
 
 		const { eventId } = req.params;
 
@@ -150,21 +138,13 @@ async function updateEvent(req, res) {
 			return;
 		}
 
-		// TODO: review sanitization
-		const cleanEventInfo = {};
 		const { title, description, categoryCode } = req.body;
 
-		if (title !== null) {
-			cleanEventInfo.title = generalSanitization(title);
-		}
-
-		if (description !== null) {
-			cleanEventInfo.description = generalSanitization(description);
-		}
-
-		if (categoryCode !== null) {
-			cleanEventInfo.categoryCode = generalSanitization(categoryCode);
-		}
+		const cleanEventInfo = {
+			title: title === null ? null : generalSanitization(title),
+			description: description === null ? null : generalSanitization(description),
+			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode)
+		};
 
 		// validations
 		if (cleanEventInfo.title && !titleValidation(cleanEventInfo.title)) {
@@ -195,12 +175,6 @@ async function deleteEvent(req, res) {
 	console.log('[deleteEvent] (controller)');
 	try {
 		// TODO: userSession
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
-		if (!userExists) {
-			res.status(400).send({ code: 'INVALID_USER_ID', result: null, success: false });
-			return;
-		}
 
 		const { eventId } = req.params;
 

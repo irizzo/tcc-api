@@ -74,7 +74,7 @@ async function priorityCodeValidation(priorityCode) {
 	return true;
 }
 
-async function categoryCodeValidation(userId, categoryCode) {
+async function categoryCodeExists(userId, categoryCode) {
 	if(!categoryCode) {
 		return false
 	}
@@ -87,6 +87,8 @@ async function categoryCodeValidation(userId, categoryCode) {
 
 	return true;
 }
+
+
 
 // TODO: review
 async function statusCodeValidation(statusCode) {
@@ -140,7 +142,7 @@ module.exports = {
 	titleValidation,
 	passwordValidation,
 	priorityCodeValidation,
-	categoryCodeValidation,
+	categoryCodeExists,
 	statusCodeValidation,
 	routineTimeValidation,
 	routineActiveTimeValidation,
