@@ -174,9 +174,26 @@ async function updateCategory(req, res) {
 
 		const { title, description } = req.body;
 
-		let cleanCategoryInfo = {
+		const cleanCategoryInfo = {
 			title: title === null ? null : generalSanitization(title),
 			description: description === null ? null : generalSanitization(description),
+		};
+
+		// check if there's any info to update
+		if (!cleanCategoryInfo.title && !cleanCategoryInfo.description) {
+			res.status(200).send({ code: 'OK', result: null, success: true });
+			return;
+		}
+
+		// validation
+		if (cleanCategoryInfo.title && !titleValidation(cleanCategoryInfo.title)) {
+			res.status(400).send({
+				code: 'INVALID_TITLE',
+				result: null,
+				success: false
+			});
+
+			return;
 		};
 
 		const categoryId = foundCategoryInfo[0].id;

@@ -147,6 +147,13 @@ async function updateEvent(req, res) {
 		};
 
 		// validations
+
+		if (!cleanEventInfo.title && !cleanEventInfo.description && !cleanEventInfo.categoryCode) {
+			// nothing to change
+			res.status(200).send({ code: 'OK', result: null, success: true });
+			return;
+		}
+
 		if (cleanEventInfo.title && !titleValidation(cleanEventInfo.title)) {
 			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
 			return;
