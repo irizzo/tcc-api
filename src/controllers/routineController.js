@@ -75,7 +75,7 @@ exports.getRoutineDetails = async (req, res) => {
 		const { routineId } = req.params;
 
 		if(!routineId) {
-			res.status(500).send({ code: 'NO_ROUTINE_ID', result: null, success: false });
+			res.status(404).send({ code: 'ROUTINE_ID_NOT_FOUND', result: null, success: false });
 			return;
 		}
 
@@ -99,6 +99,11 @@ exports.updateRoutineInfo = async (req, res) => {
 		// TODO: user validation
 
 		const { routineId } = req.params;
+
+		if (!routineId) {
+			res.status(404).send({ code: 'ROUTINE_ID_NOT_FOUND', result: null, success: false });
+			return;
+		}
 
 		const foundRoutine = await routineService.getUserRoutineById(routineId);
 		if (!foundRoutine) {

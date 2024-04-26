@@ -97,6 +97,11 @@ async function getTaskDetails(req, res) {
 
 		const { taskId } = req.params;
 
+		if (!taskId) {
+			res.status(404).send({ code: 'TASK_ID_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
 		const foundTask = await taskService.getUserTaskById(taskId);
 		if (!foundTask) {
 			res.status(404).send({ code: 'TASK_NOT_FOUND', result: null, success: false });
@@ -117,6 +122,11 @@ async function updateTaskInfo(req, res) {
 		// TODO: userSession
 
 		const { taskId } = req.params;
+
+		if (!taskId) {
+			res.status(404).send({ code: 'TASK_ID_NOT_FOUND', result: null, success: false });
+			return;
+		}
 
 		const foundTask = await taskService.getUserTaskById(taskId);
 		if (!foundTask) {

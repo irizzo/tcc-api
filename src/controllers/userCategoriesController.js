@@ -110,6 +110,12 @@ async function getCategoryByCode(req, res) {
 		} 
 		
 		const { categoryCode } = req.params;
+		
+		if (!categoryCode) {
+			res.status(404).send({ code: 'CATEGORY_CODE_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
 		// TODO: get directly from user (above)
@@ -158,6 +164,12 @@ async function updateCategory(req, res) {
 		} 
 
 		const { categoryCode } = req.params;
+		
+		if (!categoryCode) {
+			res.status(404).send({ code: 'CATEGORY_CODE_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
 		// TODO: get directly from user (above)

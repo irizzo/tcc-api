@@ -91,6 +91,11 @@ async function updateEventDates(req, res) {
 
 		const { eventId } = req.params;
 
+		if (!eventId) {
+			res.status(404).send({ code: 'EVENT_ID_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
 		const foundEvent = await eventService.getUserEventById(eventId);
 		if (!foundEvent) { 
 			res.status(404).send({ code: 'EVENT_NOT_FOUND', result: null, success: false });
@@ -131,6 +136,11 @@ async function updateEvent(req, res) {
 		// TODO: userSession
 
 		const { eventId } = req.params;
+
+		if (!eventId) {
+			res.status(404).send({ code: 'EVENT_ID_NOT_FOUND', result: null, success: false });
+			return;
+		}
 
 		const foundEvent = await eventService.getUserEventById(eventId);
 		if (!foundEvent) {
