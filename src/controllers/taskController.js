@@ -3,7 +3,7 @@ const userModel = require('../models/userModel'); // TODO: userService
 const taskService = require('../services/taskService'); 
 
 // resources
-const { dueDateValidation, titleValidation, categoryCodeValidation, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
+const { dueDateValidation, titleValidation, categoryCodeExists, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
 const { generalSanitization } = require('../resources/sanitization');
 
 // TODO: get from user session
@@ -21,7 +21,7 @@ async function createNewTask(req, res) {
 		const cleanTaskInfo = {
 			title: generalSanitization(title),
 			description: description === null ? null : generalSanitization(description),
-			dueDate: dueDate === null ? null : new Date(dueDate),  // TODO: handle date https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+			dueDate: dueDate === null ? null : new Date(dueDate),
 			toDoDate: toDoDate === null ? null : new Date(toDoDate),
 			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode),
 			priorityCode: priorityCode === null ? null : generalSanitization(priorityCode)
@@ -33,28 +33,22 @@ async function createNewTask(req, res) {
 			return;
 		}
 
-		if (cleanTaskInfo.dueDate === null) {
-		} else if (!dueDateValidation(cleanTaskInfo.dueDate)) {
+		if (cleanTaskInfo.dueDate &&!dueDateValidation(cleanTaskInfo.dueDate)) {
 			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
 			return;
 		}
 
-		if (cleanTaskInfo.toDoDate === null) {
-		} else if (!dueDateValidation(cleanTaskInfo.toDoDate)) {
+		if (cleanTaskInfo.toDoDate && !dueDateValidation(cleanTaskInfo.toDoDate)) {
 			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
 			return;
 		}
 		
-		if(cleanTaskInfo.priorityCode === null ) {
-		} else if (!priorityCodeValidation(cleanTaskInfo.priorityCode)) {
+		if (cleanTaskInfo.priorityCode && !priorityCodeValidation(cleanTaskInfo.priorityCode)) {
 			res.status(400).send({ code: 'INVALID_PRIORITY_CODE', result: null, success: false });
 			return;
 		}
 		
-		// TODO: Category validation
-		if (cleanTaskInfo.categoryCode === null) {
-
-		} else if (!categoryCodeValidation(cleanTaskInfo.categoryCode)) {
+		 if (cleanTaskInfo.categoryCode && !categoryCodeValidation(userId, cleanTaskInfo.categoryCode)) {
 			res.category(400).send({
 				code:'INVALID_CATEGORY_CODE',
 				result: null,
@@ -103,6 +97,11 @@ async function getTaskDetails(req, res) {
 
 		const { taskId } = req.params;
 
+		if (!taskId) {
+			res.status(404).send({ code: 'TASK_ID_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
 		const foundTask = await taskService.getUserTaskById(taskId);
 		if (!foundTask) {
 			res.status(404).send({ code: 'TASK_NOT_FOUND', result: null, success: false });
@@ -123,6 +122,11 @@ async function updateTaskInfo(req, res) {
 		// TODO: userSession
 
 		const { taskId } = req.params;
+
+		if (!taskId) {
+			res.status(404).send({ code: 'TASK_ID_NOT_FOUND', result: null, success: false });
+			return;
+		}
 
 		const foundTask = await taskService.getUserTaskById(taskId);
 		if (!foundTask) {
@@ -163,16 +167,12 @@ async function updateTaskInfo(req, res) {
 			return;
 		}
 
-		// TODO: Category validation
-		if (cleanTaskInfo.categoryCode && !categoryCodeValidation(cleanTaskInfo.categoryCode)) {
-			res.category(400).send({
-				code: 'INVALID_CATEGORY_CODE',
-				result: null,
-				success: false
-			});
+		if (cleanTaskInfo.categoryCode && !categoryCodeExists(userId, cleanTaskInfo.categoryCode)) {
+			res.category(400).send({ code: 'INVALID_CATEGORY_CODE', result: null, success: false });
 			return;
 		}
 
+		// TODO: REVIEW
 		const updatedTask = await taskService.updateTaskInfo(taskId, cleanTaskInfo);
 
 		res.status(200).send({ code: 'UPDATED_TASK', result: null, success: true });

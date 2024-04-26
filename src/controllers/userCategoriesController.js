@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel');
 const userCategoriesService = require('../services/userCategoriesService');
 
-const { titleValidation } = require('../resources/validations');
+const { titleValidation, categoryCodeExists } = require('../resources/validations');
 const { generalSanitization } = require('../resources/sanitization');
 const generateIdentifierCode = require('../resources/generateIdentifier');
 
@@ -16,20 +16,9 @@ async function createNewCategory(req, res) {
 		
 		// TODO: get userId from session
 
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
-
-		if(!userExists) {
-			res.status(400).send({
-				code: 'INVALID_USER_ID',
-				result: null,
-				success: false
-			})
-		}
-
 		const cleanCategoryInfo = {
-			title: sanitizeString(title),
-			description: sanitizeString(description),
+			title: generalSanitization(title),
+			description: description === null ? null : generalSanitization(description),
 		};
 
 		// validation
@@ -45,7 +34,9 @@ async function createNewCategory(req, res) {
 		
 		cleanCategoryInfo.code = generateIdentifierCode(cleanCategoryInfo.title);
 
-		// TODO: check if categoryCode is valid!
+		if (categoryCodeExists(userId, cleanCategoryInfo.code)) {
+			res.status(400).send({ code: 'CATEGORY_ALREADY_EXISTS', result: null, success: false});
+		}
 
 		const createdCategoryRes = await userCategoriesService.createNewCategory(userId, cleanCategoryInfo);
 		
@@ -119,6 +110,12 @@ async function getCategoryByCode(req, res) {
 		} 
 		
 		const { categoryCode } = req.params;
+		
+		if (!categoryCode) {
+			res.status(404).send({ code: 'CATEGORY_CODE_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
 		// TODO: get directly from user (above)
@@ -167,6 +164,12 @@ async function updateCategory(req, res) {
 		} 
 
 		const { categoryCode } = req.params;
+		
+		if (!categoryCode) {
+			res.status(404).send({ code: 'CATEGORY_CODE_NOT_FOUND', result: null, success: false });
+			return;
+		}
+
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
 		// TODO: get directly from user (above)
@@ -183,10 +186,27 @@ async function updateCategory(req, res) {
 
 		const { title, description } = req.body;
 
-		let cleanCategoryInfo = {};
+		const cleanCategoryInfo = {
+			title: title === null ? null : generalSanitization(title),
+			description: description === null ? null : generalSanitization(description),
+		};
 
-		if (title !== null) cleanTaskInfo.title = generalSanitization(title);
-		if (description !== null) cleanTaskInfo.description = generalSanitization(description);
+		// check if there's any info to update
+		if (!cleanCategoryInfo.title && !cleanCategoryInfo.description) {
+			res.status(200).send({ code: 'OK', result: null, success: true });
+			return;
+		}
+
+		// validation
+		if (cleanCategoryInfo.title && !titleValidation(cleanCategoryInfo.title)) {
+			res.status(400).send({
+				code: 'INVALID_TITLE',
+				result: null,
+				success: false
+			});
+
+			return;
+		};
 
 		const categoryId = foundCategoryInfo[0].id;
 

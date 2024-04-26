@@ -57,7 +57,11 @@ async function getCategoryByCode(userId, categoryCode) {
 
 async function updateCategory(userId, categoryId, newInfo) {
 	try {
-		return await userCategoriesModel.updateCategory(userId, categoryId, newInfo);
+		const matchList =  await userCategoriesModel.updateCategory(userId, categoryId, newInfo);
+
+		if(matchList.length === 0) return null
+		
+		return matchList[0];
 	} catch (error) {
 		throw error
 	}

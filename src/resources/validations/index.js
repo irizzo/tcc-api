@@ -1,6 +1,7 @@
 const { getPriorityByCode } = require('../../services/priorityService');
 const { getStatusByCode } = require('../../services/statusService');
-
+const { getCategoryByCode } = require('../../services/userCategoriesService');
+ 
 // TODO: general validation based on the xss pkg
 
 function dueDateValidation(date) {
@@ -73,16 +74,21 @@ async function priorityCodeValidation(priorityCode) {
 	return true;
 }
 
-// TODO: categoryCodeValidation
-async function categoryCodeValidation(categoryCode) {
-	if (categoryCode === null) {
-		return true
+async function categoryCodeExists(userId, categoryCode) {
+	if(!categoryCode) {
+		return false
 	}
 
-	// search for matches on BD
+	const dbMatch = await getCategoryByCode(userId, categoryCode);
+
+	if(!dbMatch) {
+		return false
+	}
 
 	return true;
 }
+
+
 
 // TODO: review
 async function statusCodeValidation(statusCode) {
@@ -136,7 +142,7 @@ module.exports = {
 	titleValidation,
 	passwordValidation,
 	priorityCodeValidation,
-	categoryCodeValidation,
+	categoryCodeExists,
 	statusCodeValidation,
 	routineTimeValidation,
 	routineActiveTimeValidation,
