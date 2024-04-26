@@ -51,10 +51,7 @@ async function createNewTask(req, res) {
 			return;
 		}
 		
-		// TODO: Category validation
-		if (cleanTaskInfo.categoryCode === null) {
-
-		} else if (!categoryCodeValidation(cleanTaskInfo.categoryCode)) {
+		 if (cleanTaskInfo.categoryCode && !categoryCodeValidation(userId, cleanTaskInfo.categoryCode)) {
 			res.category(400).send({
 				code:'INVALID_CATEGORY_CODE',
 				result: null,
@@ -163,13 +160,8 @@ async function updateTaskInfo(req, res) {
 			return;
 		}
 
-		// TODO: Category validation
-		if (cleanTaskInfo.categoryCode && !categoryCodeValidation(cleanTaskInfo.categoryCode)) {
-			res.category(400).send({
-				code: 'INVALID_CATEGORY_CODE',
-				result: null,
-				success: false
-			});
+		if (cleanTaskInfo.categoryCode && !categoryCodeValidation(userId, cleanTaskInfo.categoryCode)) {
+			res.category(400).send({ code: 'INVALID_CATEGORY_CODE', result: null, success: false });
 			return;
 		}
 

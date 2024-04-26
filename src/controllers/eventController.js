@@ -41,8 +41,7 @@ async function createNewEvent(req, res) {
 			return;
 		}
 
-		// TODO: Category validation
-		if (!categoryCodeValidation(cleanEventInfo.categoryCode)) {
+		if (cleanEventInfo.categoryCode && !categoryCodeValidation(userId, cleanEventInfo.categoryCode)) {
 			res.category(400).send({ code: 'INVALID_CATEGORY_CODE', result: null, success: false });
 			return;
 		}
@@ -172,8 +171,8 @@ async function updateEvent(req, res) {
 			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
 			return;
 		}
-		// TODO: Category validation
-		if (cleanEventInfo.categoryCode && !categoryCodeValidation(cleanEventInfo.categoryCode)) {
+
+		if (cleanEventInfo.categoryCode && !categoryCodeValidation(userId, cleanEventInfo.categoryCode)) {
 			res.category(400).send({
 				code: 'INVALID_CATEGORY_CODE',
 				result: null,
