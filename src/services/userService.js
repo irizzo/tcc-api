@@ -33,6 +33,15 @@ exports.getUserByEmail = async (email) => {
 	}
 }
 
+exports.getUserById = async(userId) => {
+	console.log('[getUserById] (service)');
+	try {
+		return await userModel.findUserById(userId);
+	} catch (error) {
+		throw error;
+	}
+}
+
 exports.updateUserInfo = async (userId, newInfo) => {
 	console.log('[updateUserInfo] (service)');
 	try {

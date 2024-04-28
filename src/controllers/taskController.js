@@ -1,21 +1,32 @@
-const userModel = require('../models/userModel'); // TODO: userService
+const taskService = require('../services/taskService');
+const userService = require('../services/userService');
 
-const taskService = require('../services/taskService'); 
+const { handleAuth } = require('../resources/userAuth');
 
 // resources
-const { dueDateValidation, titleValidation, categoryCodeExists, priorityCodeValidation, statusCodeValidation } = require('../resources/validations');
+const { dueDateValidation, titleValidation, categoryCodeExists, priorityCodeValidation } = require('../resources/validations');
 const { generalSanitization } = require('../resources/sanitization');
-
-// TODO: get from user session
-const userId = "stQM4UlD6n6c6h9Lmi7w";
 
 async function createNewTask(req, res) {
 	console.log('[createNewTaskController]');
 	
 	try {
-		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
+		const { authorization } = req.headers;
 
-		// TODO: userSession
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
+
+		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 
 		// sanitization
 		const cleanTaskInfo = {
@@ -78,7 +89,20 @@ async function createNewTask(req, res) {
 async function getAllTasks(req, res) {
 	console.log('[getAllTasks] (controller)');
 	try {
-		// TODO: userSession
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const tasksList = await taskService.getUserTasks(userId);
 
@@ -119,7 +143,20 @@ async function getTaskDetails(req, res) {
 async function updateTaskInfo(req, res) {
 	console.log('[updateTaskInfoController]');
 	try {
-		// TODO: userSession
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { taskId } = req.params;
 
@@ -187,7 +224,20 @@ async function deleteTask(req, res) {
 	console.log('[deleteTaskInfoController]');
 
 	try {
-		// TODO: userSession
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { taskId } = req.params;
 

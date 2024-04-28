@@ -3,14 +3,28 @@ const routineService = require('../services/routineService');
 const { titleValidation, routineTimeValidation, routineActiveTimeValidation, isObjEmpty } = require('../resources/validations');
 const { generalSanitization } = require ('../resources/sanitization')
 
-// TODO: get from user session
-const userId = "stQM4UlD6n6c6h9Lmi7w";
+const userService = require('../services/userService');
+
+const { handleAuth } = require('../resources/userAuth');
 
 exports.createNewRoutine = async (req, res) => {
 	console.log('[createNewRoutine] (controller)');
 
 	try {
-		// TODO: validate user session
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { title, description, startOfActiveTime, endOfActiveTime } = req.body;
 		
@@ -56,7 +70,20 @@ exports.createNewRoutine = async (req, res) => {
 exports.getUserRoutines = async (req, res) => {
 	console.log('[getUserRoutines] (controller)');
 	try {
-		// TODO: user validation
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const routineList = await routineService.getUserRoutines(userId);
 
@@ -70,7 +97,20 @@ exports.getUserRoutines = async (req, res) => {
 exports.getRoutineDetails = async (req, res) => {
 	console.log('[getRoutineDetails] (controller)');
 	try {
-		// TODO: user validation
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { routineId } = req.params;
 
@@ -96,7 +136,20 @@ exports.getRoutineDetails = async (req, res) => {
 exports.updateRoutineInfo = async (req, res) => {
 	console.log('[updateRoutineInfo] (controller)');
 	try {
-		// TODO: user validation
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { routineId } = req.params;
 

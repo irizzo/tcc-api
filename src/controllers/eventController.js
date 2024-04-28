@@ -1,20 +1,31 @@
-const userModel = require('../models/userModel'); // TODO: userService
-
 const eventService = require('../services/eventService');
+const userService = require('../services/userService');
+
+const { handleAuth } = require('../resources/userAuth');
 
 const { generalSanitization } = require('../resources/sanitization');
 const { dueDateValidation, endDateValidation, titleValidation, categoryCodeExists } = require('../resources/validations');
-
-// TODO: get from user session
-const userId = "stQM4UlD6n6c6h9Lmi7w";
 
 async function createNewEvent(req, res) {
 	console.log('[createNewEvent] (controller)');
 
 	try {
-		const { title, description, startDate, endDate, categoryCode } = req.body;
+		const { authorization } = req.headers;
 
-		// TODO: get userId from session
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
+		
+		const { title, description, startDate, endDate, categoryCode } = req.body;
 
 		// sanitization
 		const cleanEventInfo = {
@@ -60,17 +71,19 @@ async function getUserEvents(req, res) {
 	console.log('[getUserEvents] (controller)');
 
 	try {
-		// TODO: userSession
+		const { authorization } = req.headers;
 
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
 
-		if (!userExists) {
-			res.status(400).send({
-				code: 'INVALID_USER_ID',
-				result: null,
-				success: false
-			})
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
 		}
 
 		const eventsList = await eventService.getUserEvents(userId);
@@ -87,7 +100,20 @@ async function getUserEvents(req, res) {
 async function updateEventDates(req, res) {
 	console.log('[updateEventDates] (controller)');
 	try {
-		// TODO: userSession
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { eventId } = req.params;
 
@@ -133,7 +159,20 @@ async function updateEvent(req, res) {
 	console.log('[updateEvent] (controller)');
 
 	try {
-		// TODO: userSession
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { eventId } = req.params;
 
@@ -191,7 +230,20 @@ async function updateEvent(req, res) {
 async function deleteEvent(req, res) {
 	console.log('[deleteEvent] (controller)');
 	try {
-		// TODO: userSession
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { eventId } = req.params;
 

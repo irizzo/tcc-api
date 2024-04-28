@@ -1,20 +1,32 @@
 const userModel = require('../models/userModel');
 const userCategoriesService = require('../services/userCategoriesService');
+const userService = require('../services/userService');
 
 const { titleValidation, categoryCodeExists } = require('../resources/validations');
 const { generalSanitization } = require('../resources/sanitization');
 const generateIdentifierCode = require('../resources/generateIdentifier');
-
-// TODO: get from user session
-const userId = "stQM4UlD6n6c6h9Lmi7w";
+const { handleAuth } = require('../resources/userAuth');
 
 async function createNewCategory(req, res) {
 	console.log('[createNewCategory] (controller)');
 
 	try {
+		const { authorization } = req.headers;
+
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
+
 		const { title, description } = req.body;
-		
-		// TODO: get userId from session
 
 		const cleanCategoryInfo = {
 			title: generalSanitization(title),
@@ -48,6 +60,8 @@ async function createNewCategory(req, res) {
 
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
+		console.log(`ERROR = ${error}`);
+		console.log(`ERROR = ${error}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -60,20 +74,21 @@ async function getAllCategories(req, res) {
 	console.log('[getAllCategories] (controller)');
 
 	try {
-		// TODO: user session
+		const { authorization } = req.headers;
 
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
-
-		if (!userExists) {
-			res.status(400).send({
-				code: 'INVALID_USER_ID',
-				result: null,
-				success: false
-			})
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
 		}
 
-		// TODO: get directly from user (above)
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
+
 		const categoriesList = await userCategoriesService.getAllUserCategories(userId);
 
 		res.status(200).send({
@@ -84,6 +99,8 @@ async function getAllCategories(req, res) {
 
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
+		console.log(`ERROR = ${error}`);
+		console.log(`ERROR = ${error}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -96,18 +113,20 @@ async function getCategoryByCode(req, res) {
 	console.log('[getCategoryByCode] (controller)');
 
 	try {
-		// TODO: get user session
+		const { authorization } = req.headers;
 
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
-		
-		if (!userExists) {
-			res.status(400).send({
-				code: 'INVALID_USER_ID',
-				result: null,
-				success: false
-			})
-		} 
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 		
 		const { categoryCode } = req.params;
 		
@@ -118,7 +137,6 @@ async function getCategoryByCode(req, res) {
 
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
-		// TODO: get directly from user (above)
 		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
 		if (!foundCategoryInfo) {
 			res.status(404).send({
@@ -138,6 +156,7 @@ async function getCategoryByCode(req, res) {
 
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
+		console.log(`ERROR = ${error}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -150,18 +169,20 @@ async function updateCategory(req, res) {
 	console.log('[updateCategory] (controller)');
 
 	try {
-		// TODO: user session
+		const { authorization } = req.headers;
 
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
 
-		if (!userExists) {
-			res.status(400).send({
-				code: 'INVALID_USER_ID',
-				result: null,
-				success: false
-			})
-		} 
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 
 		const { categoryCode } = req.params;
 		
@@ -172,7 +193,6 @@ async function updateCategory(req, res) {
 
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
-		// TODO: get directly from user (above)
 		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
 		if (foundCategoryInfo.length === 0) {
 			res.status(404).send({
@@ -220,6 +240,7 @@ async function updateCategory(req, res) {
 
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
+		console.log(`ERROR = ${error}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
@@ -232,22 +253,23 @@ async function deleteCategory(req, res) {
 	console.log('[deleteCategory] (controller)');
 
 	try {
-		// TODO: get user session
+		const { authorization } = req.headers;
 
-		// validate userId
-		const userExists = await userModel.findUserById(userId);
-		if (!userExists) {
-			res.status(400).send({
-				code: 'INVALID_USER_ID',
-				result: null,
-				success: false
-			})
-		} ;
+		const authRes = handleAuth(authorization);
+		if (!authRes) {
+			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
+			return;
+		}
 
+		const userId = authRes.userId;
+
+		if (! await userService.getUserById(userId)) {
+			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
+			return;
+		}
 		const { categoryCode } = req.params;
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
-		// TODO: get directly from user (above)
 		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
 		if (foundCategoryInfo.length === 0) {
 			res.status(404).send({
@@ -270,6 +292,7 @@ async function deleteCategory(req, res) {
 		
 	} catch (error) {
 		console.log(`ERROR = ${JSON.stringify(error)}`);
+		console.log(`ERROR = ${error}`);
 		res.status(500).send({
 			code: 'INTERNAL_ERROR',
 			result: error,
