@@ -57,7 +57,7 @@ async function findUserById(userId) {
 		return false;
 	}
 
-	return true
+	return match
 }
 
 async function updateDbUser(userId, updatedInfo) {

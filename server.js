@@ -9,7 +9,7 @@ const userController = require('./src/controllers/userController');
 const taskController = require('./src/controllers/taskController');
 const userCategoriesController = require('./src/controllers/userCategoriesController');
 const eventController = require('./src/controllers/eventController');
-const routineController = require('./src/controllers/routineController')
+const routineController = require('./src/controllers/routineController');
 
 const app = express();
 const port = 8080;
@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 // user routes
-app.post('/create-user', userController.createNewUser);
+app.post('/users', userController.createNewUser);
 app.post('/login', userController.userLogin);
 
 // task routes
