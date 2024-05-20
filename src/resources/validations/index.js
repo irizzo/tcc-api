@@ -45,7 +45,7 @@ function titleValidation(title) {
 }
 
 function passwordValidation(password) {
-	if (!password || password === "" || password.length === 0) {
+	if (!password || password === '' || password.length === 0) {
 		return false;
 	}
 

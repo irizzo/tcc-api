@@ -45,7 +45,7 @@ exports.handleAuth = (authHeader) => {
 		console.log(`decodedToken = ${JSON.stringify(decodedToken)}`)
 		
 		if (!decodedToken.data.userId) {
-			throw new Error("userID not found");
+			throw new Error('userID not found');
 		}
 
 		return decodedToken.data

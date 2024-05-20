@@ -133,8 +133,8 @@ exports.getRoutineDetails = async (req, res) => {
 	}
 }
 
-exports.updateRoutineInfo = async (req, res) => {
-	console.log('[updateRoutineInfo] (controller)');
+exports.updateRoutine = async (req, res) => {
+	console.log('[updateRoutine] (controller)');
 	try {
 		const { authorization } = req.headers;
 

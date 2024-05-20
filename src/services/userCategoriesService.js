@@ -2,19 +2,19 @@ const userCategoriesModel = require('../models/userCategoriesModel');
 
 const defaultCategories = [
 	{
-		title: "Trabalho",
-		description: "Tarefas relacionas a trabalho.",
-		code: "WORK",
+		title: 'Trabalho',
+		description: 'Tarefas relacionas a trabalho.',
+		code: 'WORK',
 	},
 	{
-		title: "Acadêmico",
-		description: "Tarefas relacionadas a estudos, à escola ou faculdade.",
-		code: "ACADEMIC"
+		title: 'Acadêmico',
+		description: 'Tarefas relacionadas a estudos, à escola ou faculdade.',
+		code: 'ACADEMIC'
 	},
 	{
-		title: "Social",
-		description: "Tarefas relacionadas ao social, lazer etc",
-		code: "SOCIAL",
+		title: 'Social',
+		description: 'Tarefas relacionadas ao social, lazer etc',
+		code: 'SOCIAL',
 	}
 ]
 

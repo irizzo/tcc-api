@@ -86,8 +86,8 @@ async function createNewTask(req, res) {
 	}
 }
 
-async function getAllTasks(req, res) {
-	console.log('[getAllTasks] (controller)');
+async function getUserTasks(req, res) {
+	console.log('[getUserTasks] (controller)');
 	try {
 		const { authorization } = req.headers;
 
@@ -140,8 +140,8 @@ async function getTaskDetails(req, res) {
 	}
 }
 
-async function updateTaskInfo(req, res) {
-	console.log('[updateTaskInfoController]');
+async function updateTask(req, res) {
+	console.log('[updateTaskController]');
 	try {
 		const { authorization } = req.headers;
 
@@ -210,7 +210,7 @@ async function updateTaskInfo(req, res) {
 		}
 
 		// TODO: REVIEW
-		const updatedTask = await taskService.updateTaskInfo(taskId, cleanTaskInfo);
+		const updatedTask = await taskService.updateTask(taskId, cleanTaskInfo);
 
 		res.status(200).send({ code: 'UPDATED_TASK', result: null, success: true });
 
@@ -221,7 +221,7 @@ async function updateTaskInfo(req, res) {
 }
 
 async function deleteTask(req, res) {
-	console.log('[deleteTaskInfoController]');
+	console.log('[deleteTaskController]');
 
 	try {
 		const { authorization } = req.headers;
@@ -258,8 +258,8 @@ async function deleteTask(req, res) {
 
 module.exports = {
 	createNewTask,
-	getAllTasks,
+	getUserTasks,
 	getTaskDetails,
-	updateTaskInfo,
+	updateTask,
 	deleteTask
 }
