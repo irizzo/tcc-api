@@ -81,7 +81,9 @@ async function categoryCodeExists(userId, categoryCode) {
 
 	const dbMatch = await getCategoryByCode(userId, categoryCode);
 
-	if(!dbMatch) {
+	console.log(`dbMatch = ${JSON.stringify(dbMatch)}`)
+
+	if(dbMatch.length === 0) {
 		return false
 	}
 

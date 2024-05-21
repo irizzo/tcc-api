@@ -20,8 +20,9 @@ router
 
 router
 	.route('/:eventId')
+	.get(eventController.getEventInfo)
 	.put(eventController.updateEvent)
-	// .delete(eventController.deleteEvent)s
+	.delete(eventController.deleteEvent)
 
 router
 	.route('/:eventId/update-dates')

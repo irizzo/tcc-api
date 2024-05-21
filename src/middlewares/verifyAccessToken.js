@@ -17,23 +17,27 @@ function handleAuth(authHeader) {
 }
 
 async function verifyAccessToken(req, res, next) {
-	console.log('[verifyAccessToken]');
+	try {
+		console.log('[verifyAccessToken]');
 
-	const { authorization } = req.headers;
+		const { authorization } = req.headers;
 
-	const authRes = handleAuth(authorization);
+		const authRes = handleAuth(authorization);
 
-	if (!authRes) {
-		throw CustomError('NOT_AUTHORIZED', 401)
+		if (!authRes) {
+			throw CustomError('NOT_AUTHORIZED', 401)
+		}
+
+		const userId = authRes.userId;
+
+		if (! await userService.getUserByIdService(userId)) {
+			throw CustomError('USER_NOT_FOUND', 404)
+		}
+
+		next();
+	} catch (error) {
+		next(error)
 	}
-
-	const userId = authRes.userId;
-
-	if (! await userService.getUserById(userId)) {
-		throw CustomError('USER_NOT_FOUND', 404)
-	}
-
-	next();
 }
 
 module.exports = verifyAccessToken;

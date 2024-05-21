@@ -42,7 +42,7 @@ async function getCategoryByCode(userId, categoryCode) {
 		});
 	});
 
-	return matchList;
+	return matchList[0];
 }
 
 async function deleteCategory(userId, categoryId) {
@@ -56,8 +56,7 @@ async function updateCategory(userId, categoryId, newInfo) {
 	console.log('[updateCategory] (model)');
 
 	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
-	const updateRes = await categoryRef.update(newInfo);
-	return updateRes;
+	return await categoryRef.update(newInfo);
 }
 
 module.exports = {

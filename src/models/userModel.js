@@ -35,6 +35,7 @@ async function findUserByEmail(email) {
 	const matchList = [];
 
 	if (snapshot.empty) {
+		console.log(`snapshot.empty`);
 		return [];
 	}
 
@@ -45,6 +46,7 @@ async function findUserByEmail(email) {
 		});
 	});
 
+	console.log(`matchList not empty = ${JSON.stringify(matchList) }`);
 	return matchList;
 }
 
@@ -64,6 +66,7 @@ async function updateDbUser(userId, updatedInfo) {
 	console.log('[updateUser] (model)');
 	const userRef = usersCollectionRef.doc(userId);
 	await userRef.update(updatedInfo);
+	return;
 }
 
 module.exports = {

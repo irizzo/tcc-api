@@ -19,6 +19,7 @@ router
 
 router
 	.route('/:routineId')
+	.get(routineController.getRoutineDetails)
 	.put(routineController.updateRoutine)
 
 module.exports = router

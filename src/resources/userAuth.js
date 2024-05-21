@@ -2,18 +2,30 @@ const jwt = require('jsonwebtoken');
 
 const privateKey = process.env.JWT_SECRET;
 
-exports.generateTokenFromUserId = (userId) => {
+// TODO: implement custom error handling on the callback functions
+
+/** Generate Token From User Id
+ * @description Creates a JWT with the userId as data
+ * @param {String} userId 
+ * @returns 
+ */
+exports.generateTokenFromData = (tokenData) => {
 	try {
-		return jwt.sign({ data: { userId } }, privateKey, { expiresIn: '3d' });
+		return jwt.sign({ data: { ...tokenData } }, privateKey, { expiresIn: 60 * 60 });
 	} catch (error) {
 		throw error;
 	}
 }
 
+/** Validate Token
+ * @description Validates a JWT
+ * @param {String} token 
+ * @returns decodedToken
+ */
 exports.validateToken = (token) => {
 	try {
 		const decodedToken = jwt.verify(token, privateKey);
-		if(!decodedToken.data) {
+		if (!decodedToken.data) {
 			return false
 		}
 		return decodedToken
@@ -23,6 +35,11 @@ exports.validateToken = (token) => {
 	}
 }
 
+/** Decode Token
+ * @description Decode a JWT
+ * @param {String} token 
+ * @returns decodedToken
+ */
 exports.decodeToken = (token) => {
 	try {
 		const decoded = jwt.decode(token);
@@ -33,13 +50,13 @@ exports.decodeToken = (token) => {
 	}
 }
 
-/**
- * 
+/** Get Data From Token
+ * @description Get a certain data from a JWT
  * @param {Headers} token 
  * @param {String} dataName 
- * @returns 
+ * @returns {String} Required Data
  */
-exports.getDataFromToken = (token, dataName) => {
+exports.extractDataFromToken = (token, dataName) => {
 	const decodedToken = this.decodeToken(token);
 	const requiredData = decodedToken.data[dataName]
 	return requiredData ? requiredData : false;
