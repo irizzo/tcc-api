@@ -32,3 +32,15 @@ exports.decodeToken = (token) => {
 		throw error;
 	}
 }
+
+/**
+ * 
+ * @param {Headers} token 
+ * @param {String} dataName 
+ * @returns 
+ */
+exports.getDataFromToken = (token, dataName) => {
+	const decodedToken = this.decodeToken(token);
+	const requiredData = decodedToken.data[dataName]
+	return requiredData ? requiredData : false;
+}

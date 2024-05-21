@@ -1,60 +1,41 @@
 const routineService = require('../services/routineService');
 
-const { titleValidation, routineTimeValidation, routineActiveTimeValidation, isObjEmpty } = require('../resources/validations');
-const { generalSanitization } = require ('../resources/sanitization')
-
-const userService = require('../services/userService');
-
-const { handleAuth } = require('../resources/userAuth');
+const CustomError = require('../resources/error');
+const { getDataFromToken } = require('../resources/userAuth');
+const { titleValidation, routineTimeValidation, routineActiveTimeValidation } = require('../resources/validations');
+const { generalSanitization } = require('../resources/sanitization')
 
 exports.createNewRoutine = async (req, res) => {
 	console.log('[createNewRoutine] (controller)');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 
 		const { title, description, startOfActiveTime, endOfActiveTime } = req.body;
-		
+
 		// sanitization
 		const cleanInfo = {
 			title: generalSanitization(title),
 			description: description === null ? null : generalSanitization(description),
 			startOfActiveTime: startOfActiveTime === null ? null : startOfActiveTime,
-			endOfActiveTime: endOfActiveTime === null ? null : endOfActiveTime, 
+			endOfActiveTime: endOfActiveTime === null ? null : endOfActiveTime,
 		}
-		
+
 		// validation
-		if(!titleValidation(cleanInfo.title)) {
-			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
-			return;
+		if (!titleValidation(cleanInfo.title)) {
+			throw CustomError('INVALID_TITLE', 400);
 		}
 
 		if (cleanInfo.startOfActiveTime && !routineTimeValidation(cleanInfo.startOfActiveTime)) {
-			res.status(400).send({ code: 'INVALID_START_TIME', result: null, success: false });
-			return;
+			throw CustomError('INVALID_START_TIME' , 400);
 		}
 
 		if (cleanInfo.endOfActiveTime && !routineTimeValidation(cleanInfo.endOfActiveTime)) {
-			res.status(400).send({ code: 'INVALID_END_TIME', result: null, success: false });
-			return;
+			throw CustomError('INVALID_END_TIME' , 400);
 		}
 
 		if (cleanInfo.startOfActiveTime && cleanInfo.endOfActiveTime && !routineActiveTimeValidation(cleanInfo.startOfActiveTime, cleanInfo.endOfActiveTime)) {
-			res.status(400).send({ code: 'INVALID_TIME_INTERVAL', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TIME_INTERVAL' , 400)
 		}
 
 		const createdRoutineId = await routineService.createNewRoutine(userId, cleanInfo);
@@ -62,106 +43,55 @@ exports.createNewRoutine = async (req, res) => {
 		res.status(201).send({ code: 'CREATED_ROUTINE', result: createdRoutineId, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
 exports.getUserRoutines = async (req, res) => {
 	console.log('[getUserRoutines] (controller)');
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 
 		const routineList = await routineService.getUserRoutines(userId);
 
 		res.status(200).send({ code: 'OK', result: routineList, success: true });
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
 exports.getRoutineDetails = async (req, res) => {
 	console.log('[getRoutineDetails] (controller)');
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-
 		const { routineId } = req.params;
 
-		if(!routineId) {
-			res.status(404).send({ code: 'ROUTINE_ID_NOT_FOUND', result: null, success: false });
-			return;
+		if (!routineId) {
+			throw CustomError('ROUTINE_ID_NOT_FOUND', 400);
 		}
 
 		const foundRoutine = await routineService.getUserRoutineById(routineId);
 		if (!foundRoutine) {
-			res.status(404).send({ code: 'ROUTINE_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('ROUTINE_NOT_FOUND', 404);
 		}
 
 		res.status(200).send({ code: 'OK', result: foundRoutine.data(), success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
 exports.updateRoutine = async (req, res) => {
 	console.log('[updateRoutine] (controller)');
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-
 		const { routineId } = req.params;
-
+		
 		if (!routineId) {
-			res.status(404).send({ code: 'ROUTINE_ID_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('ROUTINE_ID_NOT_FOUND', 400);
 		}
 
-		const foundRoutine = await routineService.getUserRoutineById(routineId);
-		if (!foundRoutine) {
-			res.status(404).send({ code: 'ROUTINE_NOT_FOUND', result: null, success: false });
-			return;
+		if (!await routineService.getUserRoutineById(routineId)) {
+			throw CustomError('ROUTINE_NOT_FOUND', 404);
 		}
 
 		const { title, description, startOfActiveTime, endOfActiveTime } = req.body;
@@ -183,31 +113,25 @@ exports.updateRoutine = async (req, res) => {
 
 		// validation
 		if (cleanInfo.title && !titleValidation(cleanInfo.title)) {
-			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TITLE', 400);
 		}
 
 		if (cleanInfo.startOfActiveTime && !routineTimeValidation(cleanInfo.startOfActiveTime)) {
-			res.status(400).send({ code: 'INVALID_START_TIME', result: null, success: false });
-			return;
+			throw CustomError('INVALID_START_TIME', 400);
 		}
 
 		if (cleanInfo.endOfActiveTime && !routineTimeValidation(cleanInfo.endOfActiveTime)) {
-			res.status(400).send({ code: 'INVALID_END_TIME', result: null, success: false });
-			return;
+			throw CustomError('INVALID_END_TIME', 400);
 		}
 
 		if (cleanInfo.startOfActiveTime && cleanInfo.endOfActiveTime && !routineActiveTimeValidation(cleanInfo.startOfActiveTime, cleanInfo.endOfActiveTime)) {
-			res.status(400).send({ code: 'INVALID_TIME_INTERVAL', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TIME_INTERVAL', 400);
 		}
 
 		await routineService.updateRoutineDetails(routineId, cleanInfo);
 
 		res.status(200).send({ code: 'UPDATED_ROUTINE', result: null, success: true });
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }

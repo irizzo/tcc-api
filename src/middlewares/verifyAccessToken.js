@@ -1,5 +1,5 @@
 const { validateToken } = require('../resources/userAuth');
-const CreateError = require('../resources/error');
+const CustomError = require('../resources/error');
 const userService = require('../services/userService');
 
 function handleAuth(authHeader) {
@@ -24,13 +24,13 @@ async function verifyAccessToken(req, res, next) {
 	const authRes = handleAuth(authorization);
 
 	if (!authRes) {
-		throw CreateError('NOT_AUTHORIZED', 401)
+		throw CustomError('NOT_AUTHORIZED', 401)
 	}
 
 	const userId = authRes.userId;
 
 	if (! await userService.getUserById(userId)) {
-		throw CreateError('USER_NOT_FOUND', 404)
+		throw CustomError('USER_NOT_FOUND', 404)
 	}
 
 	next();

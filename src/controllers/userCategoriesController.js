@@ -11,20 +11,7 @@ async function createNewCategory(req, res) {
 	console.log('[createNewCategory] (controller)');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 
 		const { title, description } = req.body;
 
@@ -35,38 +22,21 @@ async function createNewCategory(req, res) {
 
 		// validation
 		if (!titleValidation(cleanCategoryInfo.title)) {
-			res.status(400).send({
-				code: 'INVALID_TITLE',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('INVALID_TITLE', 400);
 		};
-		
+
 		cleanCategoryInfo.code = generateIdentifierCode(cleanCategoryInfo.title);
 
 		if (categoryCodeExists(userId, cleanCategoryInfo.code)) {
-			res.status(400).send({ code: 'CATEGORY_ALREADY_EXISTS', result: null, success: false});
+			throw CustomError('CATEGORY_ALREADY_EXISTS', 400);
 		}
 
 		const createdCategoryRes = await userCategoriesService.createNewCategory(userId, cleanCategoryInfo);
-		
-		res.status(201).send({
-			code: 'CREATED_CATEGORY',
-			result: createdCategoryRes,
-			success: true
-		});
+
+		res.status(201).send({ code: 'CREATED_CATEGORY', result: createdCategoryRes, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
-		console.log(`ERROR = ${error}`);
-		res.status(500).send({
-			code: 'INTERNAL_ERROR',
-			result: error,
-			success: false
-		});
+		next(error);
 	}
 }
 
@@ -74,38 +44,12 @@ async function getAllCategories(req, res) {
 	console.log('[getAllCategories] (controller)');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-
 		const categoriesList = await userCategoriesService.getAllUserCategories(userId);
 
-		res.status(200).send({
-			code: 'OK',
-			result: categoriesList,
-			success: true
-		});
+		res.status(200).send({ code: 'OK', result: categoriesList, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
-		console.log(`ERROR = ${error}`);
-		res.status(500).send({
-			code: 'INTERNAL_ERROR',
-			result: error,
-			success: false
-		});
+		next(error);
 	}
 }
 
@@ -113,55 +57,23 @@ async function getCategoryByCode(req, res) {
 	console.log('[getCategoryByCode] (controller)');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-		
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 		const { categoryCode } = req.params;
-		
+
 		if (!categoryCode) {
-			res.status(404).send({ code: 'CATEGORY_CODE_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('CATEGORY_CODE_NOT_FOUND', 400);
 		}
 
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
-		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
-		if (!foundCategoryInfo) {
-			res.status(404).send({
-				code: 'CATEGORY_NOT_FOUND',
-				result: null,
-				success: false
-			});
-
-			return;
+		if (! await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode)) { 
+			throw CustomError('CATEGORY_NOT_FOUND', 404);
 		}
 
-		res.status(200).send({
-			code: 'FOUND_CATEGORY',
-			result: foundCategoryInfo,
-			success: true
-		});
+		res.status(200).send({ code: 'FOUND_CATEGORY', result: foundCategoryInfo, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
-		res.status(500).send({
-			code: 'INTERNAL_ERROR',
-			result: error,
-			success: false
-		});
+		next(error);
 	};
 };
 
@@ -169,39 +81,18 @@ async function updateCategory(req, res) {
 	console.log('[updateCategory] (controller)');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 		const { categoryCode } = req.params;
-		
+
 		if (!categoryCode) {
-			res.status(404).send({ code: 'CATEGORY_CODE_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('CATEGORY_CODE_NOT_FOUND', 400);
 		}
 
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
 		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
 		if (foundCategoryInfo.length === 0) {
-			res.status(404).send({
-				code: 'CATEGORY_NOT_FOUND',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('CATEGORY_NOT_FOUND', 404);
 		}
 
 		const { title, description } = req.body;
@@ -219,33 +110,17 @@ async function updateCategory(req, res) {
 
 		// validation
 		if (cleanCategoryInfo.title && !titleValidation(cleanCategoryInfo.title)) {
-			res.status(400).send({
-				code: 'INVALID_TITLE',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('INVALID_TITLE', 400);
 		};
 
 		const categoryId = foundCategoryInfo[0].id;
 
 		const updatedCategory = await userCategoriesService.updateCategory(userId, categoryId, cleanCategoryInfo);
 
-		res.status(200).send({
-			code: 'UPDATED_CATEGORY',
-			result: updatedCategory,
-			success: true
-		});
+		res.status(200).send({ code: 'UPDATED_CATEGORY', result: updatedCategory, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
-		res.status(500).send({
-			code: 'INTERNAL_ERROR',
-			result: error,
-			success: false
-		});
+		next(error);
 	}
 }
 
@@ -253,51 +128,27 @@ async function deleteCategory(req, res) {
 	console.log('[deleteCategory] (controller)');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 		const { categoryCode } = req.params;
+
+		if (!categoryCode) {
+			throw CustomError('CATEGORY_CODE_NOT_FOUND', 400);
+		}
+
 		const cleaCategoryCode = sanitizeCodeString(categoryCode);
 
 		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
 		if (foundCategoryInfo.length === 0) {
-			res.status(404).send({
-				code: 'CATEGORY_NOT_FOUND',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('CATEGORY_NOT_FOUND', 404);
 		}
 
 		const categoryId = foundCategoryInfo[0].id;
 		await userCategoriesService.deleteCategory(userId, categoryId);
 
-		res.status(200).send({
-			code: 'DELETED_CATEGORY',
-			result: null,
-			success: true
-		});
-		
+		res.status(200).send({ code: 'DELETED_CATEGORY', result: null, success: true });
+
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		console.log(`ERROR = ${error}`);
-		res.status(500).send({
-			code: 'INTERNAL_ERROR',
-			result: error,
-			success: false
-		});
+		next(error);
 	}
 }
 

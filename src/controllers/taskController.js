@@ -1,30 +1,16 @@
 const taskService = require('../services/taskService');
-const userService = require('../services/userService');
-
-const { handleAuth } = require('../resources/userAuth');
 
 // resources
+const CustomError = require('../resources/error');
+const { getDataFromToken } = require('../resources/userAuth');
 const { dueDateValidation, titleValidation, categoryCodeExists, priorityCodeValidation } = require('../resources/validations');
 const { generalSanitization } = require('../resources/sanitization');
 
 async function createNewTask(req, res) {
 	console.log('[createNewTaskController]');
-	
+
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 
@@ -40,135 +26,81 @@ async function createNewTask(req, res) {
 
 		// validation
 		if (!titleValidation(cleanTaskInfo.title)) {
-			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TITLE', 400);
 		}
 
-		if (cleanTaskInfo.dueDate &&!dueDateValidation(cleanTaskInfo.dueDate)) {
-			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
-			return;
+		if (cleanTaskInfo.dueDate && !dueDateValidation(cleanTaskInfo.dueDate)) {
+			throw CustomError('INVALID_DUE_DATE', 400);
 		}
 
 		if (cleanTaskInfo.toDoDate && !dueDateValidation(cleanTaskInfo.toDoDate)) {
-			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TO_DO_DATE', 400);
 		}
-		
+
 		if (cleanTaskInfo.priorityCode && !priorityCodeValidation(cleanTaskInfo.priorityCode)) {
-			res.status(400).send({ code: 'INVALID_PRIORITY_CODE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_PRIORITY_CODE', 400);
 		}
-		
-		 if (cleanTaskInfo.categoryCode && !categoryCodeValidation(userId, cleanTaskInfo.categoryCode)) {
-			res.category(400).send({
-				code:'INVALID_CATEGORY_CODE',
-				result: null,
-				success: false
-			});
-			return;
+
+		if (cleanTaskInfo.categoryCode && !categoryCodeValidation(userId, cleanTaskInfo.categoryCode)) {
+			throw CustomError('INVALID_CATEGORY_CODE', 400);
 		}
 
 		const createdTask = await taskService.createNewTask(userId, cleanTaskInfo);
 
-		res.status(201).send({
-			code: 'CREATED_TASK',
-			result: createdTask,
-			success: true
-		});
+		res.status(201).send({ code: 'CREATED_TASK', result: createdTask, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({
-			code: 'INTERNAL_ERROR',
-			result: error,
-			success: false
-		});
+		next(error);
 	}
 }
 
 async function getUserTasks(req, res) {
 	console.log('[getUserTasks] (controller)');
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-
 		const tasksList = await taskService.getUserTasks(userId);
 
 		res.status(200).send({ code: 'OK', result: tasksList, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
 async function getTaskDetails(req, res) {
 	console.log('[getTaskDetails] (controller)');
 	try {
-		// TODO: userSession
-
 		const { taskId } = req.params;
 
 		if (!taskId) {
-			res.status(404).send({ code: 'TASK_ID_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('TASK_ID_NOT_FOUND', 400);
 		}
 
 		const foundTask = await taskService.getUserTaskById(taskId);
 		if (!foundTask) {
-			res.status(404).send({ code: 'TASK_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('TASK_NOT_FOUND', 404);
 		}
 
 		res.status(200).send({ code: 'OK', result: foundTask.data(), success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
 async function updateTask(req, res) {
 	console.log('[updateTaskController]');
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 
 		const { taskId } = req.params;
 
 		if (!taskId) {
-			res.status(404).send({ code: 'TASK_ID_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('TASK_ID_NOT_FOUND', 400);
 		}
 
 		const foundTask = await taskService.getUserTaskById(taskId);
 		if (!foundTask) {
-			res.status(404).send({ code: 'TASK_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('TASK_NOT_FOUND', 404);
 		}
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
@@ -185,28 +117,23 @@ async function updateTask(req, res) {
 
 		// validations
 		if (cleanTaskInfo.title && !titleValidation(cleanTaskInfo.title)) {
-			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TITLE', 400);
 		}
 
 		if (cleanTaskInfo.dueDate && !dueDateValidation(cleanTaskInfo.dueDate)) {
-			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_DUE_DATE', 400);
 		}
 
 		if (cleanTaskInfo.toDoDate && !dueDateValidation(cleanTaskInfo.toDoDate)) {
-			res.status(400).send({ code: 'INVALID_DUE_DATE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TO_DO_DATE', 400);
 		}
 
 		if (cleanTaskInfo.priorityCode && !priorityCodeValidation(cleanTaskInfo.priorityCode)) {
-			res.status(400).send({ code: 'INVALID_PRIORITY_CODE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_PRIORITY_CODE', 400);
 		}
 
 		if (cleanTaskInfo.categoryCode && !categoryCodeExists(userId, cleanTaskInfo.categoryCode)) {
-			res.category(400).send({ code: 'INVALID_CATEGORY_CODE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_CATEGORY_CODE', 400);
 		}
 
 		// TODO: REVIEW
@@ -215,8 +142,7 @@ async function updateTask(req, res) {
 		res.status(200).send({ code: 'UPDATED_TASK', result: null, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
@@ -224,35 +150,21 @@ async function deleteTask(req, res) {
 	console.log('[deleteTaskController]');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-
 		const { taskId } = req.params;
 
-		const foundTask = await taskService.getUserTaskById(taskId);
-		if (!foundTask) {
-			res.status(404).send({ code: 'TASK_NOT_FOUND', result: null, success: false });
-			return;
+		if (!taskId) {
+			throw CustomError('TASK_ID_NOT_FOUND', 400);
+		}
+
+		if (! await taskService.getUserTaskById(taskId)) {
+			throw CustomError('TASK_NOT_FOUND', 404);
 		}
 
 		await taskService.deleteTask(taskId);
 		res.status(200).send({ code: 'DELETED_TASK', result: null, success: true });
-	
+
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 

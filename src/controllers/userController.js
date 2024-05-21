@@ -23,64 +23,31 @@ async function createNewUser(req, res) {
 
 		// validations
 		if (!cleanUser.firstName || !cleanUser.lastName || !cleanUser.email || !cleanUser.password) {
-			res.status(400).send({
-				code: 'EMPTY_FIELD',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('EMPTY_FIELD', 400);
 		};
 
 		if(!passwordValidation(cleanUser.password)) {
-			res.status(400).send({
-				code: 'INVALID_PASSWORD',
-				result: null,
-				success: false
-			});
-			
-			return;
+			throw CustomError('INVALID_PASSWORD', 400);
 		}
 
 		if (!emailValidation(cleanUser.email)) {
-			res.status(400).send({
-				code: 'INVALID_EMAIL',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('INVALID_EMAIL', 400);
 		}
 
 		// email must be unique
 		const emailMatchList = await userService.getUserByEmail(cleanUser.email);
 		if(emailMatchList.length > 0) {
-			res.status(400).send({
-				code: 'EMAIL_NOT_UNIQUE',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('EMAIL_NOT_UNIQUE', 400);
 		}
 
 		cleanUser.password = encryptPlainPass(password);
 
 		const createdUserData = await userService.createNewUser(cleanUser);
 		
-		res.status(201).send({
-			code: 'USER_CREATED',
-			result: createdUserData,
-			success: true
-		});
+		res.status(201).send({ code: 'USER_CREATED', result: createdUserData, success: true });
 		
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({
-			code: 'INTERNAL_ERROR',
-			result: error,
-			success: false
-		});
+		next(error);
 	}
 }
 
@@ -98,62 +65,30 @@ async function userLogin(req, res) {
 		
 		// validations
 		if (!passwordValidation(cleanLogInInfo.password)) {
-			res.status(400).send({
-				code: 'INVALID_PASSWORD',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('INVALID_PASSWORD', 400);
 		}
 
 		if (!emailValidation(cleanLogInInfo.email)) {
-			res.status(400).send({
-				code: 'INVALID_EMAIL',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('INVALID_EMAIL', 400);
 		}
 
 		const emailMatchList = await userService.getUserByEmail(cleanLogInInfo.email);
 		if (emailMatchList.length === 0) {
-			res.status(400).send({
-				code: 'EMAIL_NOT_REGISTERED',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('EMAIL_NOT_REGISTERED', 400);
 		}
 		
 		if (!comparePlainAndHash(cleanLogInInfo.password, emailMatchList[0].password)) {
-			res.status(400).send({
-				code: 'INCORRECT_PASSWORD',
-				result: null,
-				success: false
-			});
-
-			return;
+			throw CustomError('INCORRECT_PASSWORD', 400);
 		}
 
-		// Log in user
 		const loginInfo = await userService.login(emailMatchList[0]);
 
-		res.status(200).send({
-			code: 'USER_LOGGED_IN',
-			result: loginInfo,
-			success: true
-		});
+		// set cookies
+
+		res.status(200).send({ code: 'USER_LOGGED_IN', result: loginInfo, success: true });
 		
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({
-			code: 'INTERNAL_ERROR',
-			result: error,
-			success: false
-		});
+		next(error);
 	}
 }
 

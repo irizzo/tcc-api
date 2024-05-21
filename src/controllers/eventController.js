@@ -1,30 +1,16 @@
 const eventService = require('../services/eventService');
-const userService = require('../services/userService');
 
-const { handleAuth } = require('../resources/userAuth');
-
+const CustomError = require('../resources/error');
 const { generalSanitization } = require('../resources/sanitization');
 const { dueDateValidation, endDateValidation, titleValidation, categoryCodeExists } = require('../resources/validations');
+const { getDataFromToken } = require('../resources/userAuth');
 
-async function createNewEvent(req, res) {
+async function createNewEvent(req, res, next) {
 	console.log('[createNewEvent] (controller)');
 
 	try {
-		const { authorization } = req.headers;
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-		
 		const { title, description, startDate, endDate, categoryCode } = req.body;
 
 		// sanitization
@@ -38,23 +24,19 @@ async function createNewEvent(req, res) {
 
 		// validations
 		if (!titleValidation(cleanEventInfo.title)) {
-			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TITLE', 400);
 		}
 
 		if (!dueDateValidation(cleanEventInfo.startDate)) {
-			res.status(400).send({ code: 'INVALID_START_DATE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_START_DATE', 400);
 		}
 
 		if (!endDateValidation(cleanEventInfo.startDate, cleanEventInfo.endDate)) {
-			res.status(400).send({ code: 'INVALID_END_DATE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_END_DATE', 400);
 		}
 
 		if (cleanEventInfo.categoryCode && !categoryCodeExists(userId, cleanEventInfo.categoryCode)) {
-			res.category(400).send({ code: 'INVALID_CATEGORY_CODE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_CATEGORY_CODE', 400);
 		}
 
 		const createdEvent = await eventService.createNewEvent(userId, cleanEventInfo);
@@ -62,70 +44,36 @@ async function createNewEvent(req, res) {
 		res.status(201).send({ code: 'CREATED_EVENT', result: createdEvent, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
-async function getUserEvents(req, res) {
+async function getUserEvents(req, res, next) {
 	console.log('[getUserEvents] (controller)');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 
 		const eventsList = await eventService.getUserEvents(userId);
 
 		res.status(200).send({ code: 'OK', result: eventsList, success: true });
 		
 	} catch (error) {
-
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
-async function updateEventDates(req, res) {
+async function updateEventDates(req, res, next) {
 	console.log('[updateEventDates] (controller)');
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-
 		const { eventId } = req.params;
 
 		if (!eventId) {
-			res.status(404).send({ code: 'EVENT_ID_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('EVENT_ID_NOT_FOUND', 400);
 		}
 
-		const foundEvent = await eventService.getUserEventById(eventId);
-		if (!foundEvent) { 
-			res.status(404).send({ code: 'EVENT_NOT_FOUND', result: null, success: false });
-			return;
+		if (! await eventService.getUserEventById(eventId)) {
+			throw CustomError('EVENT_NOT_FOUND', 404);
 		}
 
 		const { startDate, endDate } = req.body;
@@ -136,13 +84,11 @@ async function updateEventDates(req, res) {
 		}
 
 		if (!dueDateValidation(cleanDates.startDate)) {
-			res.status(400).send({ code: 'INVALID_START_DATE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_START_DATE' , 400);
 		}
 
 		if (!endDateValidation(cleanDates.startDate, cleanDates.endDate)) {
-			res.status(400).send({ code: 'INVALID_END_DATE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_END_DATE', 400);
 		}
 
 		const updatedEvent = await eventService.updateEventDates(eventId, cleanDates);
@@ -150,41 +96,24 @@ async function updateEventDates(req, res) {
 		res.status(200).send({ code: 'UPDATED_EVENT_DATES', result: updatedEvent, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
-async function updateEvent(req, res) {
+async function updateEvent(req, res, next) {
 	console.log('[updateEvent] (controller)');
 
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
+		const userId = getDataFromToken(req.headers.authorization, "userId");
 
 		const { eventId } = req.params;
 
 		if (!eventId) {
-			res.status(404).send({ code: 'EVENT_ID_NOT_FOUND', result: null, success: false });
-			return;
+			throw CustomError('EVENT_ID_NOT_FOUND', 400);
 		}
 
-		const foundEvent = await eventService.getUserEventById(eventId);
-		if (!foundEvent) {
-			res.status(404).send({ code: 'EVENT_NOT_FOUND', result: null, success: false });
-			return;
+		if (! await eventService.getUserEventById(eventId)) {
+			throw CustomError('EVENT_NOT_FOUND', 404);
 		}
 
 		const { title, description, categoryCode } = req.body;
@@ -196,7 +125,6 @@ async function updateEvent(req, res) {
 		};
 
 		// validations
-
 		if (!cleanEventInfo.title && !cleanEventInfo.description && !cleanEventInfo.categoryCode) {
 			// nothing to change
 			res.status(200).send({ code: 'OK', result: null, success: true });
@@ -204,17 +132,11 @@ async function updateEvent(req, res) {
 		}
 
 		if (cleanEventInfo.title && !titleValidation(cleanEventInfo.title)) {
-			res.status(400).send({ code: 'INVALID_TITLE', result: null, success: false });
-			return;
+			throw CustomError('INVALID_TITLE', 400);
 		}
 
 		if (cleanEventInfo.categoryCode && !categoryCodeValidation(userId, cleanEventInfo.categoryCode)) {
-			res.category(400).send({
-				code: 'INVALID_CATEGORY_CODE',
-				result: null,
-				success: false
-			});
-			return;
+			throw CustomError('INVALID_CATEGORY_CODE', 400);
 		}
 
 		const updatedEvent = await eventService.updateEventInfo(eventId, cleanEventInfo);
@@ -222,45 +144,33 @@ async function updateEvent(req, res) {
 		res.status(200).send({ code: 'UPDATED_EVENT', result: updatedEvent, success: true });
 
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
 
-async function deleteEvent(req, res) {
+async function deleteEvent(req, res, next) {
 	console.log('[deleteEvent] (controller)');
 	try {
-		const { authorization } = req.headers;
-
-		const authRes = handleAuth(authorization);
-		if (!authRes) {
-			res.status(401).send({ code: 'NOT_AUTHORIZED', success: false });
-			return;
-		}
-
-		const userId = authRes.userId;
-
-		if (! await userService.getUserById(userId)) {
-			res.status(404).send({ code: 'USER_NOT_FOUND', success: false });
-			return;
-		}
-
 		const { eventId } = req.params;
 
-		const foundEvent = await eventService.getUserEventById(eventId);
-		if (!foundEvent) {
-			res.status(404).send({ code: 'EVENT_NOT_FOUND', result: null, success: false });
-			return;
+		if (!eventId) {
+			throw CustomError('EVENT_ID_NOT_FOUND', 400);
+		}
+
+		if (! await eventService.getUserEventById(eventId)) {
+			throw CustomError('EVENT_NOT_FOUND', 404);
 		}
 
 		await eventService.deleteEvent(eventId);
 
 		res.status(200).send({ code: 'DELETED_EVENT', result: null, success: true });
 	} catch (error) {
-		console.log(`ERROR = ${JSON.stringify(error)}`);
-		res.status(500).send({ code: 'INTERNAL_ERROR', result: error, success: false });
+		next(error);
 	}
 }
+
+
+// TODO: LIST EVENT DETAILS
 
 module.exports = {
 	createNewEvent,
