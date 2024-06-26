@@ -8,26 +8,46 @@ const { generalSanitization } = require('../resources/sanitization');
 const { emailValidation, passwordValidation } = require('../resources/validations');
 const { validateToken } = require('../resources/userAuth');
 
-// ver se o usuário está com o token válidp
+// ver se o usuário está com o token válido
 exports.verifyAuthCookie = async (req, res, next) => {
 	console.log('[verifyAuthCookie] controller');
-	
-	const { token } = req.cookies;
-	const isTokenValid = validateToken(token);
-	if (!token || !isTokenValid) {
-		throw CustomError('LOGGED_IN_FALSE', 401);
-	}
+	try {	
+		const { token } = req.cookies;
+		
+		console.log(`[verifyAuthCookie] controller token = ${token}`);
+		
+		if (!token) {
+			throw CustomError('LOGGED_IN_FALSE', 401);
+		}
+		
+		const isTokenValid = validateToken(token);
+		if (!isTokenValid) {
+			throw CustomError('INVALID_TOKEN', 401);
+		}
 
-	if (! await userService.getUserByIdService(isTokenValid.data.userId)) {
-		throw CustomError('USER_NOT_FOUND', 404);
+		if (! await userService.getUserByIdService(isTokenValid.data.userId)) {
+			throw CustomError('USER_NOT_FOUND', 404);
+		}
+		
+		res.status(200).send({ code: 'LOGGED_IN', success: true });
+	} catch (error) {
+		next(error)
 	}
-	
-	res.status(200).send({ code: 'LOGGED_IN', success: true });
+}
+
+exports.verifyUserAuth = async (req, res, next) => {
+	console.log('[verifyUserAuth] controller');
+
+	try {
+		res.status(200).send({ code: 'LOGGED_IN', success: true });
+	} catch (error) {
+		next(error)
+	}
 }
 
 // registro de novo usuário
-exports.singUp = async (req, res, next) => {
-	console.log('[singUp] (controller)');
+exports.signUp = async (req, res, next) => {
+	console.log('[signUp] (controller)');
 	try {
 		const { firstName, lastName, email, password } = req.body;
 
@@ -61,11 +81,14 @@ exports.singUp = async (req, res, next) => {
 		cleanUser.password = encryptPlainPass(password);
 
 		const createdUserId  = await userService.createNewUserService(cleanUser);
+		
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: createdUserId });
-
+		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ code: 'USER_CREATED', result: createdUserId, success: true });
+		res.status(201).send({ code: 'CREATED', result: {createdUserId: createdUserId, tokenCookieData: {...tokenCookieData}}, success: true });
 	} catch (error) {
+		console.log(`[signUp] (controller) error = ${JSON.stringify(error)}`);
+		console.log(`[signUp] (controller) error = ${error}`);
 		next(error);
 	}
 }
@@ -101,8 +124,10 @@ exports.login = async (req, res, next) => {
 		}
 
 		const tokenCookieData = await userService.loginService(userMatchList[0]);
+		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'USER_LOGGED_IN', success: true });
+		
+		res.status(200).send({ code: 'USER_LOGGED_IN', result: { tokenCookieData: {...tokenCookieData} }, success: true });
 
 	} catch (error) {
 		next(error);

@@ -18,7 +18,7 @@ function handleAuth(authHeader) {
 
 async function verifyAccessToken(req, res, next) {
 	try {
-		console.log('[verifyAccessToken]');
+		console.log('[verifyAccessToken] [middleware]');
 
 		const { authorization } = req.headers;
 
