@@ -29,7 +29,7 @@ exports.verifyAuthCookie = async (req, res, next) => {
 			throw CustomError('USER_NOT_FOUND', 404);
 		}
 		
-		res.status(200).send({ code: 'LOGGED_IN', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'LOGGED_IN', success: true });
 	} catch (error) {
 		next(error)
 	}
@@ -39,7 +39,7 @@ exports.verifyUserAuth = async (req, res, next) => {
 	console.log('[verifyUserAuth] controller');
 
 	try {
-		res.status(200).send({ code: 'LOGGED_IN', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'LOGGED_IN', success: true });
 	} catch (error) {
 		next(error)
 	}
@@ -85,7 +85,7 @@ exports.signUp = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: createdUserId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ code: 'CREATED', result: {createdUserId: createdUserId, tokenCookieData: {...tokenCookieData}}, success: true });
+		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: {createdUserId: createdUserId, tokenCookieData: {...tokenCookieData}}, success: true });
 	} catch (error) {
 		console.log(`[signUp] (controller) error = ${JSON.stringify(error)}`);
 		console.log(`[signUp] (controller) error = ${error}`);
@@ -127,7 +127,7 @@ exports.login = async (req, res, next) => {
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 		
-		res.status(200).send({ code: 'USER_LOGGED_IN', result: { tokenCookieData: {...tokenCookieData} }, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'USER_LOGGED_IN', result: { tokenCookieData: {...tokenCookieData} }, success: true });
 
 	} catch (error) {
 		next(error);
@@ -139,7 +139,7 @@ exports.logout = async (req, res, next) => {
 	console.log('[logout] controller');
 	try {
 		res.clearCookie('token');
-		res.status(200).send({ code: 'LOGGED_OUT', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'LOGGED_OUT', success: true });
 	} catch (error) {
 		next(error);
 	}

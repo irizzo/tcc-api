@@ -42,7 +42,7 @@ exports.createNewRoutine = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId});
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ code: 'CREATED', result: createdRoutineId, success: true });
+		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: createdRoutineId, success: true });
 
 	} catch (error) {
 		next(error);
@@ -58,7 +58,7 @@ exports.getUserRoutines = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 
-		res.status(200).send({ code: 'FOUND', result: routineList, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: routineList, success: true });
 	} catch (error) {
 		next(error);
 	}
@@ -82,7 +82,7 @@ exports.getRoutineDetails = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: foundRoutine.data(), success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: foundRoutine.data(), success: true });
 
 	} catch (error) {
 		next(error);
@@ -115,7 +115,7 @@ exports.updateRoutine = async (req, res, next) => {
 		// check if there's any info to update
 		if (!cleanInfo.title && !cleanInfo.description && !cleanInfo.startOfActiveTime && !cleanInfo.endOfActiveTime) {
 			// nothing to change
-			res.status(200).send({ code: 'OK', success: true });
+			res.status(200).send({ tokenCookieData: tokenCookieData, code: 'OK', success: true });
 			return;
 		}
 		
@@ -142,7 +142,7 @@ exports.updateRoutine = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 	} catch (error) {
 		next(error);
 	}

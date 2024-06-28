@@ -35,7 +35,7 @@ async function createNewCategory(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ code: 'CREATED', result: createdCategoryId, success: true });
+		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: createdCategoryId, success: true });
 
 	} catch (error) {
 		next(error);
@@ -52,7 +52,7 @@ async function getAllCategories(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: categoriesList, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: categoriesList, success: true });
 
 	} catch (error) {
 		next(error);
@@ -80,7 +80,7 @@ async function getCategoryByCode(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: foundCategoryInfo, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: foundCategoryInfo, success: true });
 
 	} catch (error) {
 		next(error);
@@ -115,7 +115,7 @@ async function updateCategory(req, res, next) {
 
 		// check if there's any info to update
 		if (!cleanCategoryInfo.title && !cleanCategoryInfo.description) {
-			res.status(200).send({ code: 'OK', result: null, success: true });
+			res.status(200).send({ tokenCookieData: tokenCookieData, code: 'OK', result: null, success: true });
 			return;
 		}
 
@@ -129,7 +129,7 @@ async function updateCategory(req, res, next) {
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 
-		res.status(200).send({ code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
 		next(error);
@@ -159,7 +159,7 @@ async function deleteCategory(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'DELETED', result: null, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'DELETED', result: null, success: true });
 
 	} catch (error) {
 		next(error);

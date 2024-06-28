@@ -51,7 +51,7 @@ async function createNewTask(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ code: 'CREATED', result: createdTaskId, success: true });
+		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: createdTaskId, success: true });
 
 	} catch (error) {
 		next(error);
@@ -67,7 +67,7 @@ async function getUserTasks(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: tasksList, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: tasksList, success: true });
 
 	} catch (error) {
 		next(error);
@@ -92,7 +92,7 @@ async function getTaskDetails(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: foundTask.data(), success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: foundTask.data(), success: true });
 
 	} catch (error) {
 		next(error);
@@ -154,7 +154,7 @@ async function updateTask(req, res, next) {
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 
-		res.status(200).send({ code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
 		next(error);
@@ -181,7 +181,7 @@ async function deleteTask(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'DELETED', result: null, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'DELETED', result: null, success: true });
 
 	} catch (error) {
 		next(error);
