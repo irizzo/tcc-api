@@ -8,37 +8,16 @@ const { generalSanitization } = require('../resources/sanitization');
 const { emailValidation, passwordValidation } = require('../resources/validations');
 const { validateToken } = require('../resources/userAuth');
 
-// ver se o usuário está com o token válido
-exports.verifyAuthCookie = async (req, res, next) => {
-	console.log('[verifyAuthCookie] controller');
-	try {	
-		const { token } = req.cookies;
-		
-		console.log(`[verifyAuthCookie] controller token = ${token}`);
-		
-		if (!token) {
-			throw CustomError('LOGGED_IN_FALSE', 401);
-		}
-		
-		const isTokenValid = validateToken(token);
-		if (!isTokenValid) {
-			throw CustomError('INVALID_TOKEN', 401);
-		}
-
-		if (! await userService.getUserByIdService(isTokenValid.data.userId)) {
-			throw CustomError('USER_NOT_FOUND', 404);
-		}
-		
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'LOGGED_IN', success: true });
-	} catch (error) {
-		next(error)
-	}
-}
-
+// verificar se o usuário está com o token válido
 exports.verifyUserAuth = async (req, res, next) => {
 	console.log('[verifyUserAuth] controller');
-
 	try {
+		const { authorization } = req.headers;
+		const decodedToken = validateToken(authorization);
+
+		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: decodedToken.data.userId });
+
+		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'LOGGED_IN', success: true });
 	} catch (error) {
 		next(error)
@@ -85,7 +64,7 @@ exports.signUp = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: createdUserId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: {createdUserId: createdUserId, tokenCookieData: {...tokenCookieData}}, success: true });
+		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: { createdUserId: createdUserId }, success: true });
 	} catch (error) {
 		console.log(`[signUp] (controller) error = ${JSON.stringify(error)}`);
 		console.log(`[signUp] (controller) error = ${error}`);
@@ -127,7 +106,7 @@ exports.login = async (req, res, next) => {
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 		
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'USER_LOGGED_IN', result: { tokenCookieData: {...tokenCookieData} }, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'USER_LOGGED_IN', success: true });
 
 	} catch (error) {
 		next(error);
@@ -139,7 +118,7 @@ exports.logout = async (req, res, next) => {
 	console.log('[logout] controller');
 	try {
 		res.clearCookie('token');
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'LOGGED_OUT', success: true });
+		res.status(200).send({ code: 'LOGGED_OUT', success: true });
 	} catch (error) {
 		next(error);
 	}

@@ -15,6 +15,8 @@ async function createNewTask(req, res, next) {
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 		
+		console.log('req.body = ', { title, description, dueDate, categoryCode, priorityCode, toDoDate })
+		
 		// sanitization
 		const cleanTaskInfo = {
 			title: generalSanitization(title),
@@ -24,6 +26,8 @@ async function createNewTask(req, res, next) {
 			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode),
 			priorityCode: priorityCode === null ? null : generalSanitization(priorityCode)
 		}
+		
+		console.log('cleanTaskInfo: ', cleanTaskInfo); 
 		
 		// validation
 		if (!titleValidation(cleanTaskInfo.title)) {
@@ -92,7 +96,7 @@ async function getTaskDetails(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: foundTask.data(), success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: foundTask, success: true });
 
 	} catch (error) {
 		next(error);

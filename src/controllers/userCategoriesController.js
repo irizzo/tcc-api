@@ -59,6 +59,7 @@ async function getAllCategories(req, res, next) {
 	}
 }
 
+// TODO: change from 'code' to 'id'
 async function getCategoryByCode(req, res, next) {
 	console.log('[getCategoryByCode] (controller)');
 
@@ -136,6 +137,7 @@ async function updateCategory(req, res, next) {
 	}
 }
 
+// TODO: change from 'category code' to 'category id'
 async function deleteCategory(req, res, next) {
 	console.log('[deleteCategory] (controller)');
 

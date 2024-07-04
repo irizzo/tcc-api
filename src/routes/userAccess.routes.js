@@ -4,10 +4,6 @@ const router = express.Router();
 const userAccessController = require('../controllers/userAccessController');
 const verifyAccessToken = require('../middlewares/verifyAccessToken.js');
 
-
-router.route('/')
-	.get(userAccessController.verifyAuthCookie)
-
 router.route('/verify')
 	.all(verifyAccessToken)
 	.get(userAccessController.verifyUserAuth)
