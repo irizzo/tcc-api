@@ -26,7 +26,7 @@ async function getUserTasks(userId) {
 	try {
 		const tasksList = await taskModel.getUserTasks(userId);
 
-		console.log('[getUserTaskById] match: ', match);
+		console.log('[getUserTaskById] tasksList: ', tasksList);
 
 
 		if (!tasksList || tasksList.length === 0) {

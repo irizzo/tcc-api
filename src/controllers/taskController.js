@@ -185,7 +185,7 @@ async function deleteTask(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'DELETED', result: null, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'DELETED', success: true });
 
 	} catch (error) {
 		next(error);

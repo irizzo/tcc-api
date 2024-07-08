@@ -10,15 +10,15 @@ exports.createNewEvent = async (req, res, next) => {
 	console.log('[createNewEvent] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const { title, description, startDate, endDate, categoryCode } = req.body;
 
 		// sanitization
 		const cleanEventInfo = {
 			title: generalSanitization(title),
 			description: description === null ? null : generalSanitization(description),
-			startDate: new Date(startDate),
-			endDate: new Date(endDate),
+			startDate: startDate === null ? null : new Date(startDate),
+			endDate: endDate === null ? null : new Date(endDate),
 			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode)
 		};
 
@@ -86,7 +86,7 @@ exports.getEventInfo = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: eventFound.data(), success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: eventFound, success: true });
 	} catch (error) {
 		next(error);
 	}

@@ -20,7 +20,27 @@ function formatDatesInArray (arr) {
 	return formatted;
 }
 
+function formatEventDates(events) {
+	const formatted = events.map((event) => {
+		const aux = event;
+
+		if (event.startDate) {
+			aux.startDate = convertStampToDate(event.startDate);
+		}
+
+		if (event.endDate) {
+			aux.endDate = convertStampToDate(event.endDate);
+		}
+		console.log('aux: ', aux);
+		return aux
+	})
+
+	return formatted;
+}
+
+
 module.exports = {
 	convertStampToDate,
-	formatDatesInArray
+	formatDatesInArray,
+	formatEventDates
 }

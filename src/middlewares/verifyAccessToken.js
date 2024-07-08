@@ -2,7 +2,7 @@ const { validateToken } = require('../resources/userAuth');
 const CustomError = require('../resources/error');
 const userService = require('../services/userService');
 
-function handleAuth(authHeader) {
+function handleAuthHeader(authHeader) {
 	if (!authHeader) {
 		return false
 	}
@@ -22,7 +22,7 @@ async function verifyAccessToken(req, res, next) {
 
 		const { authorization } = req.headers;
 
-		const authRes = handleAuth(authorization);
+		const authRes = handleAuthHeader(authorization);
 
 		if (!authRes) {
 			throw CustomError('NOT_AUTHORIZED', 401)

@@ -66,8 +66,6 @@ exports.signUp = async (req, res, next) => {
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: { createdUserId: createdUserId }, success: true });
 	} catch (error) {
-		console.log(`[signUp] (controller) error = ${JSON.stringify(error)}`);
-		console.log(`[signUp] (controller) error = ${error}`);
 		next(error);
 	}
 }

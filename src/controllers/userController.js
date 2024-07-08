@@ -1,7 +1,6 @@
 const userService = require('../services/userService');
 
 // resources
-const CustomError = require('../resources/error')
 const { encryptPlainPass, comparePlainAndHash } = require('../resources/encrypt');
 const { generalSanitization } = require('../resources/sanitization');
 const { emailValidation, passwordValidation } = require('../resources/validations');

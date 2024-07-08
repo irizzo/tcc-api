@@ -3,7 +3,6 @@ const { db } = require('../firebaseConfig');
 const usersCollectionRef = db.collection('users');
 
 async function createDbCategory(userId, category) {
-	console.log('[createDbCategory] (model)');
 	
 	const categoryRef = await usersCollectionRef.doc(userId).collection('categories').add(category);
 	const createdCategoryId = categoryRef.id;
@@ -12,8 +11,6 @@ async function createDbCategory(userId, category) {
 }
 
 async function getAllDbCategories(userId) {
-	console.log('[getAllDbCategories] (model)');
-
 	const categoriesList = [];
 
 	const snapshot = await usersCollectionRef.doc(userId).collection('categories').get();
@@ -25,9 +22,24 @@ async function getAllDbCategories(userId) {
 	return categoriesList;
 }
 
-async function getCategoryByCode(userId, categoryCode) {
-	console.log('[getCategoryByCode] (model)');
+async function findCategoryById(userId, categoryId) {
 
+
+	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
+	const match = await categoryRef.get();
+
+	if (!match.exists) {
+		return false;
+	}
+
+	return {
+		id: match.id,
+		...match.data()
+	};
+}
+
+
+async function getCategoryByCode(userId, categoryCode) {
 	const matchList = [];
 	const snapshot = await usersCollectionRef.doc(userId).collection('categories').where('code', '==', categoryCode).get();
 
@@ -46,15 +58,11 @@ async function getCategoryByCode(userId, categoryCode) {
 }
 
 async function deleteCategory(userId, categoryId) {
-	console.log('[deleteCategory] (model)');
-
 	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
 	await categoryRef.delete();
 }
 
 async function updateCategory(userId, categoryId, newInfo) {
-	console.log('[updateCategory] (model)');
-
 	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
 	return await categoryRef.update(newInfo);
 }
@@ -62,6 +70,7 @@ async function updateCategory(userId, categoryId, newInfo) {
 module.exports = {
 	createDbCategory,
 	getAllDbCategories,
+	findCategoryById,
 	getCategoryByCode,
 	updateCategory,
 	deleteCategory

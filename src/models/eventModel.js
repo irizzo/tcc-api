@@ -41,7 +41,10 @@ async function findEventById(eventId) {
 		return false;
 	}
 
-	return match; 
+	return {
+		id: match.id,
+		...match.data()
+	};
 }
 
 async function updateEvent(eventId, newInfo) {
