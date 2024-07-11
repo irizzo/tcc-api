@@ -2,7 +2,7 @@ const { validateToken } = require('../resources/userAuth');
 const CustomError = require('../resources/error');
 const userService = require('../services/userService');
 
-function handleAuth(authHeader) {
+function handleAuthHeader(authHeader) {
 	if (!authHeader) {
 		return false
 	}
@@ -17,12 +17,11 @@ function handleAuth(authHeader) {
 }
 
 async function verifyAccessToken(req, res, next) {
+	console.log('[verifyAccessToken] [middleware]');
 	try {
-		console.log('[verifyAccessToken]');
-
 		const { authorization } = req.headers;
 
-		const authRes = handleAuth(authorization);
+		const authRes = handleAuthHeader(authorization);
 
 		if (!authRes) {
 			throw CustomError('NOT_AUTHORIZED', 401)
@@ -36,6 +35,7 @@ async function verifyAccessToken(req, res, next) {
 
 		next();
 	} catch (error) {
+		console.log('[verifyAccessToken] [middleware] error:', error);
 		next(error)
 	}
 }

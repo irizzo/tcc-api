@@ -15,6 +15,8 @@ async function createNewTask(req, res, next) {
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 		
+		console.log('req.body = ', { title, description, dueDate, categoryCode, priorityCode, toDoDate })
+		
 		// sanitization
 		const cleanTaskInfo = {
 			title: generalSanitization(title),
@@ -24,6 +26,8 @@ async function createNewTask(req, res, next) {
 			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode),
 			priorityCode: priorityCode === null ? null : generalSanitization(priorityCode)
 		}
+		
+		console.log('cleanTaskInfo: ', cleanTaskInfo); 
 		
 		// validation
 		if (!titleValidation(cleanTaskInfo.title)) {
@@ -51,7 +55,7 @@ async function createNewTask(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ code: 'CREATED', result: createdTaskId, success: true });
+		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: createdTaskId, success: true });
 
 	} catch (error) {
 		next(error);
@@ -67,7 +71,7 @@ async function getUserTasks(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: tasksList, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: tasksList, success: true });
 
 	} catch (error) {
 		next(error);
@@ -92,7 +96,7 @@ async function getTaskDetails(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: foundTask.data(), success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: foundTask, success: true });
 
 	} catch (error) {
 		next(error);
@@ -115,6 +119,9 @@ async function updateTask(req, res, next) {
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 
+
+		console.log('[updateTaskController] req.body: ', { title, description, dueDate, categoryCode, priorityCode, toDoDate });
+
 		// sanitization
 		const cleanTaskInfo = {};
 
@@ -123,7 +130,12 @@ async function updateTask(req, res, next) {
 		if (dueDate !== null) cleanTaskInfo.dueDate = new Date(dueDate);
 		if (toDoDate !== null) cleanTaskInfo.toDoDate = new Date(toDoDate);
 		if (categoryCode !== null) cleanTaskInfo.categoryCode = generalSanitization(categoryCode);
-		if (priorityCode !== null) cleanTaskInfo.priorityCode = generalSanitization(priorityCode);;
+		if (priorityCode !== null) cleanTaskInfo.priorityCode = generalSanitization(priorityCode);
+		
+		console.log('[updateTaskController] cleanTaskInfo: ', cleanTaskInfo);
+
+		const uId = extractDataFromToken(req.headers.authorization, "userId");
+		console.log('[updateTaskController] uId: ', uId);
 
 		// validations
 		if (cleanTaskInfo.title && !titleValidation(cleanTaskInfo.title)) {
@@ -142,21 +154,20 @@ async function updateTask(req, res, next) {
 			throw CustomError('INVALID_PRIORITY_CODE', 400);
 		}
 
-		if (cleanTaskInfo.categoryCode && !categoryCodeExists(userId, cleanTaskInfo.categoryCode)) {
+		if (cleanTaskInfo.categoryCode && !categoryCodeExists(uId, cleanTaskInfo.categoryCode)) {
 			throw CustomError('INVALID_CATEGORY_CODE', 400);
 		}
 
-		// TODO: REVIEW
 		await taskService.updateTaskInfo(taskId, cleanTaskInfo);
 
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
-		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
+		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: uId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 
-		res.status(200).send({ code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
+		console.log('[updateTaskController] error: ', error);
 		next(error);
 	}
 }
@@ -181,7 +192,7 @@ async function deleteTask(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'DELETED', result: null, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'DELETED', success: true });
 
 	} catch (error) {
 		next(error);

@@ -43,7 +43,10 @@ async function findTaskById(taskId) {
 		return false;
 	}
 
-	return match;
+	return {
+		id: match.id,
+		...match.data()
+	};
 }
 
 async function updateTask(taskId, newInfo) {

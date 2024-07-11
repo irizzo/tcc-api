@@ -59,7 +59,10 @@ async function findUserById(userId) {
 		return false;
 	}
 
-	return match
+	return {
+		id: match.id,
+		...match.data()
+	};
 }
 
 async function updateDbUser(userId, updatedInfo) {

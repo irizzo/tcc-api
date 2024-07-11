@@ -10,15 +10,15 @@ exports.createNewEvent = async (req, res, next) => {
 	console.log('[createNewEvent] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const { title, description, startDate, endDate, categoryCode } = req.body;
 
 		// sanitization
 		const cleanEventInfo = {
 			title: generalSanitization(title),
 			description: description === null ? null : generalSanitization(description),
-			startDate: new Date(startDate),
-			endDate: new Date(endDate),
+			startDate: startDate === null ? null : new Date(startDate),
+			endDate: endDate === null ? null : new Date(endDate),
 			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode)
 		};
 
@@ -44,7 +44,7 @@ exports.createNewEvent = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ code: 'CREATED', result: createdEventId, success: true });
+		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: createdEventId, success: true });
 
 	} catch (error) {
 		next(error);
@@ -61,7 +61,7 @@ exports.getUserEvents = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: eventsList, success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: eventsList, success: true });
 		
 	} catch (error) {
 		next(error);
@@ -86,7 +86,7 @@ exports.getEventInfo = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', result: eventFound.data(), success: true});
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: eventFound, success: true });
 	} catch (error) {
 		next(error);
 	}
@@ -126,7 +126,7 @@ exports.updateEventDates = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
 		next(error);
@@ -159,7 +159,7 @@ exports.updateEvent = async (req, res, next) => {
 		// validations
 		if (!cleanEventInfo.title && !cleanEventInfo.description && !cleanEventInfo.categoryCode) {
 			// nothing to change
-			res.status(200).send({ code: 'OK', success: true });
+			res.status(200).send({ tokenCookieData: tokenCookieData, code: 'OK', success: true });
 			return;
 		}
 		
@@ -176,7 +176,7 @@ exports.updateEvent = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
 		next(error);
@@ -202,7 +202,7 @@ exports.deleteEvent = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'DELETED', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'DELETED', success: true });
 	} catch (error) {
 		next(error);
 	}

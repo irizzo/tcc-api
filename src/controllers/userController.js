@@ -1,7 +1,6 @@
 const userService = require('../services/userService');
 
 // resources
-const CustomError = require('../resources/error')
 const { encryptPlainPass, comparePlainAndHash } = require('../resources/encrypt');
 const { generalSanitization } = require('../resources/sanitization');
 const { emailValidation, passwordValidation } = require('../resources/validations');
@@ -15,7 +14,7 @@ exports.getUserInfo = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'FOUND', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', success: true });
 
 	} catch (error) {
 		next(error)
@@ -31,7 +30,7 @@ exports.updateUser = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 	} catch (error) {
 		next(error)
 	}
