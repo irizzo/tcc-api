@@ -59,7 +59,6 @@ async function getAllCategories(req, res, next) {
 	}
 }
 
-// TODO: change from 'code' to 'id'
 async function getCategoryByCode(req, res, next) {
 	console.log('[getCategoryByCode] (controller)');
 
@@ -88,34 +87,36 @@ async function getCategoryByCode(req, res, next) {
 	};
 };
 
-// TODO: REVIEW SERVICE
 async function updateCategory(req, res, next) {
 	console.log('[updateCategory] (controller)');
 
 	try {
 		const userId = extractDataFromToken(req.headers.authorization, "userId");
-		const { categoryCode } = req.params;
+		const { categoryId } = req.params;
 
-		if (!categoryCode) {
-			throw CustomError('CATEGORY_CODE_NOT_FOUND', 400);
+		if (!categoryId) {
+			throw CustomError('INVALID_CATEGORY_ID', 400);
 		}
 
-		const cleaCategoryCode = generalSanitization(categoryCode);
-
-		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
+		const foundCategoryInfo = await userCategoriesService.getCategoryById(userId, categoryId)
 		if (foundCategoryInfo.length === 0) {
 			throw CustomError('CATEGORY_NOT_FOUND', 404);
 		}
 
 		const { title, description } = req.body;
 
-		const cleanCategoryInfo = {
-			title: title === null ? null : generalSanitization(title),
-			description: description === null ? null : generalSanitization(description),
-		};
+		const cleanCategoryInfo = { };
+
+		if (title !== null) cleanCategoryInfo.title = generalSanitization(title);
+		if (description !== null) cleanCategoryInfo.description = generalSanitization(description);
+
+		console.log('[updateCategory] (controller) cleanCategoryInfo: ', cleanCategoryInfo);
+
+		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		// check if there's any info to update
 		if (!cleanCategoryInfo.title && !cleanCategoryInfo.description) {
+			console.log('[updateCategory] (controller) nada pra atualizar');
 			res.status(200).send({ tokenCookieData: tokenCookieData, code: 'OK', result: null, success: true });
 			return;
 		}
@@ -125,11 +126,9 @@ async function updateCategory(req, res, next) {
 			throw CustomError('INVALID_TITLE', 400);
 		};
 
-		await userCategoriesService.updateCategory(userId, foundCategoryInfo.id, cleanCategoryInfo);
-		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
+		await userCategoriesService.updateCategory(userId, categoryId, cleanCategoryInfo);
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-
 		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
@@ -137,26 +136,27 @@ async function updateCategory(req, res, next) {
 	}
 }
 
-// TODO: change from 'category code' to 'category id'
 async function deleteCategory(req, res, next) {
 	console.log('[deleteCategory] (controller)');
 
 	try {
 		const userId = extractDataFromToken(req.headers.authorization, "userId");
-		const { categoryCode } = req.params;
+		const { categoryId } = req.params;
 
-		if (!categoryCode) {
+		console.log('[deleteCategory] (controller) userId: ', userId);
+		console.log('[deleteCategory] (controller) categoryId: ', categoryId);
+
+
+		if (!categoryId) {
 			throw CustomError('CATEGORY_CODE_NOT_FOUND', 400);
 		}
 
-		const cleaCategoryCode = generalSanitization(categoryCode);
-
-		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode);
+		const foundCategoryInfo = await userCategoriesService.getCategoryById(userId, categoryId);
 		if (foundCategoryInfo.length === 0) {
 			throw CustomError('CATEGORY_NOT_FOUND', 404);
 		}
 
-		await userCategoriesService.deleteCategory(userId, foundCategoryInfo.id);
+		await userCategoriesService.deleteCategory(userId, categoryId);
 
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 

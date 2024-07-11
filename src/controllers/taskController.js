@@ -119,6 +119,9 @@ async function updateTask(req, res, next) {
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 
+
+		console.log('[updateTaskController] req.body: ', { title, description, dueDate, categoryCode, priorityCode, toDoDate });
+
 		// sanitization
 		const cleanTaskInfo = {};
 
@@ -127,7 +130,12 @@ async function updateTask(req, res, next) {
 		if (dueDate !== null) cleanTaskInfo.dueDate = new Date(dueDate);
 		if (toDoDate !== null) cleanTaskInfo.toDoDate = new Date(toDoDate);
 		if (categoryCode !== null) cleanTaskInfo.categoryCode = generalSanitization(categoryCode);
-		if (priorityCode !== null) cleanTaskInfo.priorityCode = generalSanitization(priorityCode);;
+		if (priorityCode !== null) cleanTaskInfo.priorityCode = generalSanitization(priorityCode);
+		
+		console.log('[updateTaskController] cleanTaskInfo: ', cleanTaskInfo);
+
+		const uId = extractDataFromToken(req.headers.authorization, "userId");
+		console.log('[updateTaskController] uId: ', uId);
 
 		// validations
 		if (cleanTaskInfo.title && !titleValidation(cleanTaskInfo.title)) {
@@ -146,21 +154,20 @@ async function updateTask(req, res, next) {
 			throw CustomError('INVALID_PRIORITY_CODE', 400);
 		}
 
-		if (cleanTaskInfo.categoryCode && !categoryCodeExists(userId, cleanTaskInfo.categoryCode)) {
+		if (cleanTaskInfo.categoryCode && !categoryCodeExists(uId, cleanTaskInfo.categoryCode)) {
 			throw CustomError('INVALID_CATEGORY_CODE', 400);
 		}
 
-		// TODO: REVIEW
 		await taskService.updateTaskInfo(taskId, cleanTaskInfo);
 
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
-		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
+		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: uId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 
 		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
+		console.log('[updateTaskController] error: ', error);
 		next(error);
 	}
 }

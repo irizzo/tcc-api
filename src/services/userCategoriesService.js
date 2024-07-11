@@ -55,10 +55,17 @@ async function getCategoryByCode(userId, categoryCode) {
 	}
 }
 
+async function getCategoryById(userId, categoryId) {
+	try {
+		return await userCategoriesModel.findCategoryById(userId, categoryId);
+	} catch (error) {
+		throw error
+	}
+}
+
 async function updateCategory(userId, categoryId, newInfo) {
 	try {
-		return await userCategoriesModel.updateCategory(userId, categoryId, newInfo);		
-		
+		return await userCategoriesModel.updateCategory(userId, categoryId, newInfo);
 	} catch (error) {
 		throw error
 	}
@@ -77,6 +84,7 @@ module.exports = {
 	createNewCategory,
 	getAllUserCategories,
 	getCategoryByCode,
+	getCategoryById,
 	updateCategory,
 	deleteCategory
 };

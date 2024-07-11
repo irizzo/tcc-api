@@ -7,8 +7,8 @@ async function createNewTask(userId, newTaskInfo) {
 		const taskInfo = { 
 			...newTaskInfo, 
 			statusCode: 'NOT_STARTED', 
-			createdAt:  new Date(Date.now()),
-			updatedAt:  new Date(Date.now()),
+			createdAt: new Date(Date.now()),
+			updatedAt: new Date(Date.now()),
 			userId
 		};
 
@@ -79,6 +79,7 @@ async function updateTaskInfo(taskId, newInfo) {
 		return;
 
 	} catch (error) {
+		console.log('[updateTaskInfo] error: ', error);
 		throw error;
 	}
 }
@@ -90,7 +91,6 @@ async function deleteTask(taskId) {
 		return;
 	} catch (error) {
 		throw error;
-
 	}
 }
 

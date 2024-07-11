@@ -19,7 +19,7 @@ router
 	.post(categoriesController.createNewCategory)
 
 router
-	.route('/:categoryCode')
+	.route('/:categoryId')
 	.get(categoriesController.getCategoryByCode)
 	.put(categoriesController.updateCategory)
 	.delete(categoriesController.deleteCategory)

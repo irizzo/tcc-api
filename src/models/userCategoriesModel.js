@@ -16,15 +16,13 @@ async function getAllDbCategories(userId) {
 	const snapshot = await usersCollectionRef.doc(userId).collection('categories').get();
 
 	snapshot.forEach(doc => {
-		categoriesList.push(doc.data());
+		categoriesList.push({id: doc.id, ...doc.data()});
 	});
 
 	return categoriesList;
 }
 
 async function findCategoryById(userId, categoryId) {
-
-
 	const categoryRef = usersCollectionRef.doc(userId).collection('categories').doc(categoryId);
 	const match = await categoryRef.get();
 

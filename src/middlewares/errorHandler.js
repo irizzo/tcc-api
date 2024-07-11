@@ -1,7 +1,5 @@
 async function errorHandler(err, req, res, next) {
-	console.log('Middleware Error Handling');
-	console.log(`Middleware Error Handling err = ${JSON.stringify(err)}`);
-	console.log(`Middleware Error Handling err = ${err}`);
+	console.log('Middleware Error Handling err: ', err);
 
 	const errStatus = err.statusCode || 500;
 	const errCode = err.errorCode || 'INTERNAL_ERROR';
