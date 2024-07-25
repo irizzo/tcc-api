@@ -18,7 +18,7 @@ exports.verifyUserAuth = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: decodedToken.data.userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'LOGGED_IN', success: true });
+		res.status(200).send({ tokenCookieData, code: 'LOGGED_IN', success: true });
 	} catch (error) {
 		next(error)
 	}
@@ -64,7 +64,7 @@ exports.signUp = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: createdUserId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: { createdUserId: createdUserId }, success: true });
+		res.status(201).send({ tokenCookieData, code: 'CREATED', result: { createdUserId: createdUserId }, success: true });
 	} catch (error) {
 		next(error);
 	}
@@ -104,7 +104,7 @@ exports.login = async (req, res, next) => {
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 		
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'USER_LOGGED_IN', success: true });
+		res.status(200).send({ tokenCookieData, code: 'USER_LOGGED_IN', success: true });
 
 	} catch (error) {
 		next(error);
