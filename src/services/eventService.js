@@ -1,5 +1,5 @@
 const eventModel = require('../models/eventModel');
-const { formatDatesInArray, convertStampToDate } = require('../resources/dates.helpers');
+const { formatEventDates, convertStampToDate } = require('../resources/dates.helpers');
 
 async function createNewEvent(userId, newEventInfo) {
 	console.log('[createNewEvent] (service)');
@@ -24,8 +24,6 @@ async function getUserEvents(userId) {
 	try {
 		const eventsList = await eventModel.getUserEvents(userId);
 
-		console.log('[getUserEventById] match: ', match);
-
 
 		if (!eventsList || eventsList.length === 0) {
 			console.log('eventList vazia');
@@ -33,7 +31,7 @@ async function getUserEvents(userId) {
 			return [];
 		}
 
-		const formattedEventList = formatDatesInArray(eventsList);
+		const formattedEventList = formatEventDates(eventsList);
 		return formattedEventList;
 		
 	} catch (error) {
@@ -46,35 +44,21 @@ async function getUserEventById(eventId) {
 	try {
 		const match = await eventModel.findEventById(eventId);
 
-		console.log('[getUserEventById] match: ', match);
-
 		if (!match) {
 			return false
 		}
 
-		if (match.toDoDate) {
-			console.log('[getUserEventById] match.toDoDate: ', match.toDoDate);
-			match.toDoDate = convertStampToDate(match.toDoDate)
+		if (match.startDate) {
+			console.log('[getUserEventById] match.startDate: ', match.startDate);
+			match.startDate = convertStampToDate(match.startDate)
 		}
 
-		if (match.dueDate) {
-			console.log('[getUserEventById] match.dueDate: ', match.dueDate);
-			match.dueDate = convertStampToDate(match.dueDate)
+		if (match.endDate) {
+			console.log('[getUserEventById] match.endDate: ', match.endDate);
+			match.endDate = convertStampToDate(match.endDate)
 		}
 
 		return match;
-
-	} catch (error) {
-		throw error;
-	}
-}
-
-async function updateEventDates(eventId, newInfo) {
-	console.log('[updateEventDates] (service)');
-	try {
-		const updatedInfo = { ...newInfo, updatedAt:  new Date(Date.now()) };
-	  await eventModel.updateEvent(eventId, updatedInfo);
-		return;
 
 	} catch (error) {
 		throw error;
@@ -108,7 +92,6 @@ module.exports = {
 	createNewEvent,
 	getUserEvents,
 	getUserEventById,
-	updateEventDates,
 	updateEventInfo,
 	deleteEvent
 }

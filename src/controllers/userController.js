@@ -1,20 +1,27 @@
 const userService = require('../services/userService');
+const userAccessService = require('../services/userAccessService')
 
 // resources
-const { encryptPlainPass, comparePlainAndHash } = require('../resources/encrypt');
-const { generalSanitization } = require('../resources/sanitization');
-const { emailValidation, passwordValidation } = require('../resources/validations');
+const CustomError = require('../resources/error');
+const { extractDataFromToken } = require('../resources/userAuth');
 
 exports.getUserInfo = async (req, res, next) => {
 	console.log('[getUserInfo] (controller)');
 	try {
-		console.log('not implemented yet');
-
 		const userId = extractDataFromToken(req.headers.authorization, "userId");
+
+		const userFound = await userService.getUserByIdService(userId);
+		
+		console.log('[getUserInfo] userFound: ', userFound);
+
+		if (!userFound) {
+			throw new CustomError('NOT_FOUND', 404);
+		}
+
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', success: true });
+		res.status(200).send({ tokenCookieData, result: userFound, code: 'FOUND', success: true });
 
 	} catch (error) {
 		next(error)
@@ -24,13 +31,11 @@ exports.getUserInfo = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
 	console.log('[updateUser] (controller)');
 	try {
-		console.log('not implemented yet');
-
 		const userId = extractDataFromToken(req.headers.authorization, "userId");
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData, code: 'UPDATED', success: true });
 	} catch (error) {
 		next(error)
 	}

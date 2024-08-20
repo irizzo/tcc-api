@@ -36,8 +36,8 @@ async function getUserTasks(userId) {
 		}
 
 		const formattedTaskList = formatDatesInArray(tasksList);
-
 		return formattedTaskList;
+		
 	} catch (error) {
 		throw error;
 	}
