@@ -24,8 +24,4 @@ router
 	.put(eventController.updateEvent)
 	.delete(eventController.deleteEvent)
 
-router
-	.route('/:eventId/update-dates')
-	.put(eventController.updateEventDates)
-
 module.exports = router

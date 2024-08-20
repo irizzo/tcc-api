@@ -55,7 +55,7 @@ async function createNewTask(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: createdTaskId, success: true });
+		res.status(201).send({ tokenCookieData, code: 'CREATED', result: createdTaskId, success: true });
 
 	} catch (error) {
 		next(error);
@@ -71,7 +71,7 @@ async function getUserTasks(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: tasksList, success: true });
+		res.status(200).send({ tokenCookieData, code: 'FOUND', result: tasksList, success: true });
 
 	} catch (error) {
 		next(error);
@@ -96,7 +96,7 @@ async function getTaskDetails(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: foundTask, success: true });
+		res.status(200).send({ tokenCookieData, code: 'FOUND', result: foundTask, success: true });
 
 	} catch (error) {
 		next(error);
@@ -138,6 +138,12 @@ async function updateTask(req, res, next) {
 		console.log('[updateTaskController] uId: ', uId);
 
 		// validations
+		if (!cleanTaskInfo.title && !cleanTaskInfo.description && !cleanTaskInfo.categoryCode && !cleanTaskInfo.priorityCode && !cleanTaskInfo.dueDate && !cleanTaskInfo.toDoDate) {
+			// nothing to change
+			res.status(200).send({ tokenCookieData, code: 'OK', success: true });
+			return;
+		}
+
 		if (cleanTaskInfo.title && !titleValidation(cleanTaskInfo.title)) {
 			throw CustomError('INVALID_TITLE', 400);
 		}
@@ -164,7 +170,7 @@ async function updateTask(req, res, next) {
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
 		console.log('[updateTaskController] error: ', error);
@@ -192,7 +198,7 @@ async function deleteTask(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'DELETED', success: true });
+		res.status(200).send({ tokenCookieData, code: 'DELETED', success: true });
 
 	} catch (error) {
 		next(error);

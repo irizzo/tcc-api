@@ -44,7 +44,7 @@ exports.createNewEvent = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(201).send({ tokenCookieData: tokenCookieData, code: 'CREATED', result: createdEventId, success: true });
+		res.status(201).send({ tokenCookieData, code: 'CREATED', result: createdEventId, success: true });
 
 	} catch (error) {
 		next(error);
@@ -61,7 +61,7 @@ exports.getUserEvents = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: eventsList, success: true });
+		res.status(200).send({ tokenCookieData, code: 'FOUND', result: eventsList, success: true });
 		
 	} catch (error) {
 		next(error);
@@ -86,48 +86,7 @@ exports.getEventInfo = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'FOUND', result: eventFound, success: true });
-	} catch (error) {
-		next(error);
-	}
-}
-
-exports.updateEventDates = async (req, res, next) => {
-	console.log('[updateEventDates] (controller)');
-	try {
-		const { eventId } = req.params;
-		
-		if (!eventId) {
-			throw CustomError('EVENT_ID_NOT_FOUND', 400);
-		}
-		
-		if (! await eventService.getUserEventById(eventId)) {
-			throw CustomError('EVENT_NOT_FOUND', 404);
-		}
-		
-		const { startDate, endDate } = req.body;
-		
-		const cleanDates = {
-			startDate: new Date(startDate),
-			endDate: new Date(endDate),
-		}
-
-		if (!dueDateValidation(cleanDates.startDate)) {
-			throw CustomError('INVALID_START_DATE' , 400);
-		}
-		
-		if (!endDateValidation(cleanDates.startDate, cleanDates.endDate)) {
-			throw CustomError('INVALID_END_DATE', 400);
-		}
-		
-		await eventService.updateEventDates(eventId, cleanDates);
-
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
-		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
-		
-		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
-
+		res.status(200).send({ tokenCookieData, code: 'FOUND', result: eventFound, success: true });
 	} catch (error) {
 		next(error);
 	}
@@ -148,18 +107,22 @@ exports.updateEvent = async (req, res, next) => {
 			throw CustomError('EVENT_NOT_FOUND', 404);
 		}
 		
-		const { title, description, categoryCode } = req.body;
-		
-		const cleanEventInfo = {
-			title: title === null ? null : generalSanitization(title),
-			description: description === null ? null : generalSanitization(description),
-			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode)
-		};
-		
+		const { title, description, categoryCode, startDate, endDate } = req.body;
+
+		console.log('req.body: ', { title, description, categoryCode, startDate, endDate })
+
+		const cleanEventInfo = { };
+
+		if (title !== null) cleanEventInfo.title = generalSanitization(title);
+		if (description !== null) cleanEventInfo.description = generalSanitization(description);
+		if (categoryCode !== null) cleanEventInfo.categoryCode = generalSanitization(categoryCode);
+		if (startDate !== null) cleanEventInfo.startDate = new Date(startDate);
+		if (endDate !== null) cleanEventInfo.endDate = new Date(endDate);
+
 		// validations
-		if (!cleanEventInfo.title && !cleanEventInfo.description && !cleanEventInfo.categoryCode) {
+		if (!cleanEventInfo.title && !cleanEventInfo.description && !cleanEventInfo.categoryCode && !cleanEventInfo.startDate && !cleanEventInfo.endDate) {
 			// nothing to change
-			res.status(200).send({ tokenCookieData: tokenCookieData, code: 'OK', success: true });
+			res.status(200).send({ tokenCookieData, code: 'OK', success: true });
 			return;
 		}
 		
@@ -170,13 +133,21 @@ exports.updateEvent = async (req, res, next) => {
 		if (cleanEventInfo.categoryCode && !categoryCodeExists(userId, cleanEventInfo.categoryCode)) {
 			throw CustomError('INVALID_CATEGORY_CODE', 400);
 		}
+
+		if (!dueDateValidation(cleanEventInfo.startDate)) {
+			throw CustomError('INVALID_START_DATE', 400);
+		}
+
+		if (!endDateValidation(cleanEventInfo.startDate, cleanEventInfo.endDate)) {
+			throw CustomError('INVALID_END_DATE', 400);
+		}
 		
 		await eventService.updateEventInfo(eventId, cleanEventInfo);
 
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 		
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'UPDATED', success: true });
+		res.status(200).send({ tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
 		next(error);
@@ -202,7 +173,7 @@ exports.deleteEvent = async (req, res, next) => {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-		res.status(200).send({ tokenCookieData: tokenCookieData, code: 'DELETED', success: true });
+		res.status(200).send({ tokenCookieData, code: 'DELETED', success: true });
 	} catch (error) {
 		next(error);
 	}
