@@ -117,10 +117,10 @@ async function updateTask(req, res, next) {
 			throw CustomError('TASK_NOT_FOUND', 404);
 		}
 
-		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
+		const { title, description, dueDate, categoryCode, priorityCode, toDoDate, statusCode } = req.body;
 
 
-		console.log('[updateTaskController] req.body: ', { title, description, dueDate, categoryCode, priorityCode, toDoDate });
+		console.log('[updateTaskController] req.body: ', { title, description, dueDate, categoryCode, priorityCode, toDoDate, statusCode });
 
 		// sanitization
 		const cleanTaskInfo = {};
@@ -131,14 +131,15 @@ async function updateTask(req, res, next) {
 		if (toDoDate !== null) cleanTaskInfo.toDoDate = new Date(toDoDate);
 		if (categoryCode !== null) cleanTaskInfo.categoryCode = generalSanitization(categoryCode);
 		if (priorityCode !== null) cleanTaskInfo.priorityCode = generalSanitization(priorityCode);
+		if (statusCode !== null) cleanTaskInfo.statusCode = generalSanitization(statusCode);
 		
 		console.log('[updateTaskController] cleanTaskInfo: ', cleanTaskInfo);
 
 		const uId = extractDataFromToken(req.headers.authorization, "userId");
-		console.log('[updateTaskController] uId: ', uId);
-
+		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: uId });
+		
 		// validations
-		if (!cleanTaskInfo.title && !cleanTaskInfo.description && !cleanTaskInfo.categoryCode && !cleanTaskInfo.priorityCode && !cleanTaskInfo.dueDate && !cleanTaskInfo.toDoDate) {
+		if (!cleanTaskInfo.title && !cleanTaskInfo.description && !cleanTaskInfo.categoryCode && !cleanTaskInfo.priorityCode && !cleanTaskInfo.dueDate && !cleanTaskInfo.toDoDate && !cleanTaskInfo.statusCode) {
 			// nothing to change
 			res.status(200).send({ tokenCookieData, code: 'OK', success: true });
 			return;
@@ -166,10 +167,7 @@ async function updateTask(req, res, next) {
 
 		await taskService.updateTaskInfo(taskId, cleanTaskInfo);
 
-		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: uId });
-
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
-
 		res.status(200).send({ tokenCookieData, code: 'UPDATED', success: true });
 
 	} catch (error) {
