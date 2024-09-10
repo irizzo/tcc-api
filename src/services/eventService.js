@@ -24,7 +24,6 @@ async function getUserEvents(userId) {
 	try {
 		const eventsList = await eventModel.getUserEvents(userId);
 
-
 		if (!eventsList || eventsList.length === 0) {
 			console.log('eventList vazia');
 
@@ -84,7 +83,6 @@ async function deleteEvent(eventId) {
 		return;
 	} catch (error) {
 		throw error;
-
 	}
 }
 
