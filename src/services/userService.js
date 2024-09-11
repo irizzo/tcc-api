@@ -62,3 +62,14 @@ exports.loginService = async (userInfo) => {
 		throw error;
 	}
 }
+
+exports.deleteUserService = async (userId) => {
+	console.log('[deleteUserService]');
+
+	try {
+		return await userModel.deleteDbUser(userId);
+		
+	} catch (error) {
+		throw error;
+	}
+}

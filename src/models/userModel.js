@@ -72,10 +72,18 @@ async function updateDbUser(userId, updatedInfo) {
 	return;
 }
 
+async function deleteDbUser(userId) {
+	console.log('[deleteUser] (model)');
+	const userRef = usersCollectionRef.doc(userId);
+	const deleteRes = await userRef.delete();
+	return deleteRes;
+}
+
 module.exports = {
 	createDbUser,
 	getAllDbUsers,
 	findUserByEmail,
 	findUserById,
-	updateDbUser
+	updateDbUser,
+	deleteDbUser
 };

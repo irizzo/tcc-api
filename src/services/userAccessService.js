@@ -1,4 +1,4 @@
-const { generateTokenFromData } = require("../resources/userAuth");
+const { generateTokenFromData } = require('../resources/userAuth');
 
 const domain = process.env.NODE_ENV === 'production' ? process.env.PROD_DOMAIN : process.env.DEV_DOMAIN;
 
