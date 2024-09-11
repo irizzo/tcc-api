@@ -55,7 +55,7 @@ exports.getUserEvents = async (req, res, next) => {
 	console.log('[getUserEvents] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const eventsList = await eventService.getUserEvents(userId);
 		
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
@@ -82,7 +82,7 @@ exports.getEventInfo = async (req, res, next) => {
 			throw CustomError('EVENT_NOT_FOUND', 404);
 		}
 		
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
@@ -96,7 +96,7 @@ exports.updateEvent = async (req, res, next) => {
 	console.log('[updateEvent] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const { eventId } = req.params;
 
 		if (!eventId) {
@@ -169,7 +169,7 @@ exports.deleteEvent = async (req, res, next) => {
 
 		await eventService.deleteEvent(eventId);
 
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);

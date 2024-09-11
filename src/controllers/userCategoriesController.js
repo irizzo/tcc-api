@@ -11,7 +11,7 @@ async function createNewCategory(req, res, next) {
 	console.log('[createNewCategory] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 
 		const { title, description } = req.body;
 
@@ -46,7 +46,7 @@ async function getAllCategories(req, res, next) {
 	console.log('[getAllCategories] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const categoriesList = await userCategoriesService.getAllUserCategories(userId);
 
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
@@ -63,7 +63,7 @@ async function getCategoryByCode(req, res, next) {
 	console.log('[getCategoryByCode] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const { categoryCode } = req.params;
 
 		if (!categoryCode) {
@@ -91,7 +91,7 @@ async function updateCategory(req, res, next) {
 	console.log('[updateCategory] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const { categoryId } = req.params;
 
 		if (!categoryId) {
@@ -140,7 +140,7 @@ async function deleteCategory(req, res, next) {
 	console.log('[deleteCategory] (controller)');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const { categoryId } = req.params;
 
 		console.log('[deleteCategory] (controller) userId: ', userId);

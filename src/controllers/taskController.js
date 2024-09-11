@@ -11,7 +11,7 @@ async function createNewTask(req, res, next) {
 	console.log('[createNewTaskController]');
 
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 
 		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
 		
@@ -65,7 +65,7 @@ async function createNewTask(req, res, next) {
 async function getUserTasks(req, res, next) {
 	console.log('[getUserTasks] (controller)');
 	try {
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const tasksList = await taskService.getUserTasks(userId);
 		
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
@@ -92,7 +92,7 @@ async function getTaskDetails(req, res, next) {
 			throw CustomError('TASK_NOT_FOUND', 404);
 		}
 
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
@@ -135,7 +135,7 @@ async function updateTask(req, res, next) {
 		
 		console.log('[updateTaskController] cleanTaskInfo: ', cleanTaskInfo);
 
-		const uId = extractDataFromToken(req.headers.authorization, "userId");
+		const uId = extractDataFromToken(req.headers.authorization, 'userId');
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: uId });
 		
 		// validations
@@ -192,7 +192,7 @@ async function deleteTask(req, res, next) {
 
 		await taskService.deleteTask(taskId);
 
-		const userId = extractDataFromToken(req.headers.authorization, "userId");
+		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);

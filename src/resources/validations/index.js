@@ -90,8 +90,6 @@ async function categoryCodeExists(userId, categoryCode) {
 	return true;
 }
 
-
-
 // TODO: review
 async function statusCodeValidation(statusCode) {
 	const codeMatch = await getStatusByCode(statusCode);
