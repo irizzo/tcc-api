@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const userAccessController = require('../controllers/userAccessController');
-const verifyAccessToken = require('../middlewares/verifyAccessToken.js');
+const { verifyAccessToken } = require('../middlewares/verifyAccess.js');
 
 router.route('/verify')
 	.all(verifyAccessToken)
