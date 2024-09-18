@@ -70,9 +70,9 @@ async function getCategoryByCode(req, res, next) {
 			throw CustomError('CATEGORY_CODE_NOT_FOUND', 400);
 		}
 
-		const cleaCategoryCode = generalSanitization(categoryCode);
+		const cleanCategoryCode = generalSanitization(categoryCode);
 
-		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleaCategoryCode)
+		const foundCategoryInfo = await userCategoriesService.getCategoryByCode(userId, cleanCategoryCode)
 		if (!foundCategoryInfo) {
 			throw CustomError('CATEGORY_NOT_FOUND', 404);
 		}

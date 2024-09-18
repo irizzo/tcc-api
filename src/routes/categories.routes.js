@@ -24,4 +24,9 @@ router
 	.put(categoriesController.updateCategory)
 	.delete(categoriesController.deleteCategory)
 
+router
+	.route('/:categoryCode')
+	.get(categoriesController.getCategoryByCode)
+
+
 module.exports = router
