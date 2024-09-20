@@ -5,18 +5,19 @@ const CustomError = require('../resources/error');
 const { generalSanitization } = require('../resources/sanitization');
 const { titleValidation, categoryCodeExists } = require('../resources/validations');
 const { extractDataFromToken } = require('../resources/userAuth');
+const { isObjectEmpty } = require('../resources/utils');
 
 exports.createNewNote = async (req, res, next) => {
 	console.log('[createNewNote]');
 
 	try {
 		const userId = extractDataFromToken(req.headers.authorization, 'userId');
-		const { title, content, categoryCode } = req.body;
+		const { title, innerContent, categoryCode } = req.body;
 
 		// sanitization
 		const cleanNoteInfo = {
 			title: title === null ? null : generalSanitization(title),
-			content: generalSanitization(content),
+			innerContent: generalSanitization(innerContent),
 			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode)
 		}
 
@@ -62,6 +63,8 @@ exports.updateNote = async (req, res, next) => {
 
 	try {
 		const userId = extractDataFromToken(req.headers.authorization, 'userId');
+		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
+		
 		const { noteId } = req.params;
 
 		if (!noteId) {
@@ -72,18 +75,19 @@ exports.updateNote = async (req, res, next) => {
 			throw CustomError('NOTE_NOT_FOUND', 404);
 		}
 
-		const { title, content, categoryCode } = req.body;
+		const { title, innerContent, categoryCode } = req.body;
 
-		console.log('req.body: ', { title, content, categoryCode })
+		console.log('req.body: ', { title, innerContent, categoryCode })
 
 		const cleanNoteInfo = {};
 
 		if (title !== null) cleanNoteInfo.title = generalSanitization(title);
-		if (content !== null) cleanNoteInfo.content = generalSanitization(content);
+		if (innerContent !== null) cleanNoteInfo.innerContent = generalSanitization(innerContent);
 		if (categoryCode !== null) cleanNoteInfo.categoryCode = generalSanitization(categoryCode);
 
 		// validations
-		if (!cleanNoteInfo.title && !cleanNoteInfo.content && !cleanNoteInfo.categoryCode ) {
+		if (isObjectEmpty(cleanNoteInfo)) {
+			console.log('nothing to change')
 			res.status(200).send({ tokenCookieData, code: 'OK', success: true });
 			return;
 		}
@@ -97,8 +101,6 @@ exports.updateNote = async (req, res, next) => {
 		}
 
 		await noteService.updateNoteInfo(noteId, cleanNoteInfo);
-
-		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: userId });
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);
 		res.status(200).send({ tokenCookieData, code: 'UPDATED', success: true });
