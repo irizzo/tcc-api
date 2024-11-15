@@ -13,16 +13,16 @@ async function createNewTask(req, res, next) {
 	try {
 		const userId = extractDataFromToken(req.headers.authorization, 'userId');
 
-		const { title, description, dueDate, categoryCode, priorityCode, toDoDate } = req.body;
+		const { title, description, dueDate, categoryCode, priorityCode, schedueledDate } = req.body;
 		
-		console.log('req.body = ', { title, description, dueDate, categoryCode, priorityCode, toDoDate })
+		console.log('req.body = ', { title, description, dueDate, categoryCode, priorityCode, schedueledDate })
 		
 		// sanitization
 		const cleanTaskInfo = {
 			title: generalSanitization(title),
 			description: description === null ? null : generalSanitization(description),
 			dueDate: dueDate === null ? null : new Date(dueDate),
-			toDoDate: toDoDate === null ? null : new Date(toDoDate),
+			schedueledDate: schedueledDate === null ? null : new Date(schedueledDate),
 			categoryCode: categoryCode === null ? null : generalSanitization(categoryCode),
 			priorityCode: priorityCode === null ? null : generalSanitization(priorityCode)
 		}
@@ -38,8 +38,8 @@ async function createNewTask(req, res, next) {
 			throw CustomError('INVALID_DUE_DATE', 400);
 		}
 		
-		if (cleanTaskInfo.toDoDate && !dueDateValidation(cleanTaskInfo.toDoDate)) {
-			throw CustomError('INVALID_TO_DO_DATE', 400);
+		if (cleanTaskInfo.schedueledDate && !dueDateValidation(cleanTaskInfo.schedueledDate)) {
+			throw CustomError('INVALID_SCHEDUELED_DATE', 400);
 		}
 		
 		if (cleanTaskInfo.priorityCode && !priorityCodeValidation(cleanTaskInfo.priorityCode)) {
@@ -117,10 +117,10 @@ async function updateTask(req, res, next) {
 			throw CustomError('TASK_NOT_FOUND', 404);
 		}
 
-		const { title, description, dueDate, categoryCode, priorityCode, toDoDate, statusCode } = req.body;
+		const { title, description, dueDate, categoryCode, priorityCode, schedueledDate, statusCode } = req.body;
 
 
-		console.log('[updateTaskController] req.body: ', { title, description, dueDate, categoryCode, priorityCode, toDoDate, statusCode });
+		console.log('[updateTaskController] req.body: ', { title, description, dueDate, categoryCode, priorityCode, schedueledDate, statusCode });
 
 		// sanitization
 		const cleanTaskInfo = {};
@@ -128,7 +128,7 @@ async function updateTask(req, res, next) {
 		if (title !== null) cleanTaskInfo.title = generalSanitization(title);
 		if (description !== null) cleanTaskInfo.description = generalSanitization(description);
 		if (dueDate !== null) cleanTaskInfo.dueDate = new Date(dueDate);
-		if (toDoDate !== null) cleanTaskInfo.toDoDate = new Date(toDoDate);
+		if (schedueledDate !== null) cleanTaskInfo.schedueledDate = new Date(schedueledDate);
 		if (categoryCode !== null) cleanTaskInfo.categoryCode = generalSanitization(categoryCode);
 		if (priorityCode !== null) cleanTaskInfo.priorityCode = generalSanitization(priorityCode);
 		if (statusCode !== null) cleanTaskInfo.statusCode = generalSanitization(statusCode);
@@ -139,7 +139,7 @@ async function updateTask(req, res, next) {
 		const tokenCookieData = userAccessService.generateTokenCookieData({ userId: uId });
 		
 		// validations
-		if (!cleanTaskInfo.title && !cleanTaskInfo.description && !cleanTaskInfo.categoryCode && !cleanTaskInfo.priorityCode && !cleanTaskInfo.dueDate && !cleanTaskInfo.toDoDate && !cleanTaskInfo.statusCode) {
+		if (!cleanTaskInfo.title && !cleanTaskInfo.description && !cleanTaskInfo.categoryCode && !cleanTaskInfo.priorityCode && !cleanTaskInfo.dueDate && !cleanTaskInfo.schedueledDate && !cleanTaskInfo.statusCode) {
 			// nothing to change
 			res.status(200).send({ tokenCookieData, code: 'OK', success: true });
 			return;
@@ -153,8 +153,8 @@ async function updateTask(req, res, next) {
 			throw CustomError('INVALID_DUE_DATE', 400);
 		}
 
-		if (cleanTaskInfo.toDoDate && !dueDateValidation(cleanTaskInfo.toDoDate)) {
-			throw CustomError('INVALID_TO_DO_DATE', 400);
+		if (cleanTaskInfo.schedueledDate && !dueDateValidation(cleanTaskInfo.schedueledDate)) {
+			throw CustomError('INVALID_SCHEDUELED_DATE', 400);
 		}
 
 		if (cleanTaskInfo.priorityCode && !priorityCodeValidation(cleanTaskInfo.priorityCode)) {

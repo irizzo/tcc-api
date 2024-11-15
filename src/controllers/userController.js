@@ -5,6 +5,7 @@ const userAccessService = require('../services/userAccessService')
 const CustomError = require('../resources/error');
 const { generalSanitization } = require('../resources/sanitization');
 const { emailValidation, passwordValidation } = require('../resources/validations');
+const { encryptPlainPass, comparePlainAndHash } = require('../resources/encrypt');
 const { extractDataFromToken } = require('../resources/userAuth');
 const { isObjectEmpty } = require('../resources/utils');
 
@@ -56,11 +57,15 @@ exports.updateUser = async (req, res, next) => {
 		if (cleanUserInfo.password && !passwordValidation(cleanUserInfo.password)) {
 			throw CustomError('INVALID_PASSWORD', 400);
 		}
+		
+		if (cleanUserInfo.password) {
+			cleanUserInfo.password = encryptPlainPass(password)
+		}
 
 		if (cleanUserInfo.email && !emailValidation(cleanUserInfo.email)) {
 			throw CustomError('INVALID_EMAIL', 400);
 		}
-
+		
 		await userService.updateUserInfoService(userId, cleanUserInfo);
 
 		res.cookie(tokenCookieData.name, tokenCookieData.value, tokenCookieData.options);

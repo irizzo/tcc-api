@@ -30,8 +30,10 @@ async function getUserEvents(userId) {
 			return [];
 		}
 
-		const formattedEventList = formatEventDates(eventsList);
-		return formattedEventList;
+		return eventsList;
+
+		// const formattedEventList = formatEventDates(eventsList);
+		// return formattedEventList;
 		
 	} catch (error) {
 		throw error;

@@ -35,6 +35,8 @@ async function getUserTasks(userId) {
 			return [];
 		}
 
+		// return tasksList;
+
 		const formattedTaskList = formatDatesInArray(tasksList);
 		return formattedTaskList;
 		
@@ -54,9 +56,9 @@ async function getUserTaskById(taskId) {
 			return false
 		}
 
-		if(match.toDoDate) {
-			console.log('[getUserTaskById] match.toDoDate: ', match.toDoDate);
-			match.toDoDate = convertStampToDate(match.toDoDate)
+		if(match.schedueledDAte) {
+			console.log('[getUserTaskById] match.schedueledDAte: ', match.schedueledDAte);
+			match.schedueledDAte = convertStampToDate(match.schedueledDAte)
 		}
 
 		if (match.dueDate) {
