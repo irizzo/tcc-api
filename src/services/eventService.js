@@ -6,8 +6,8 @@ async function createNewEvent(userId, newEventInfo) {
 	try {
 		const eventInfo = {
 			...newEventInfo,
-			createdAt:  new Date(Date.now()), 
-			updatedAt:  new Date(Date.now()),
+			createdAt:  new Date(), 
+			updatedAt:  new Date(),
 			userId
 		};
 
@@ -25,16 +25,11 @@ async function getUserEvents(userId) {
 		const eventsList = await eventModel.getUserEvents(userId);
 
 		if (!eventsList || eventsList.length === 0) {
-			console.log('eventList vazia');
-
 			return [];
 		}
-
-		return eventsList;
-
-		// const formattedEventList = formatEventDates(eventsList);
-		// return formattedEventList;
 		
+		return formatEventDates(eventsList);
+
 	} catch (error) {
 		throw error;
 	}
@@ -50,12 +45,10 @@ async function getUserEventById(eventId) {
 		}
 
 		if (match.startDate) {
-			console.log('[getUserEventById] match.startDate: ', match.startDate);
 			match.startDate = convertStampToDate(match.startDate)
 		}
 
 		if (match.endDate) {
-			console.log('[getUserEventById] match.endDate: ', match.endDate);
 			match.endDate = convertStampToDate(match.endDate)
 		}
 
@@ -69,7 +62,7 @@ async function getUserEventById(eventId) {
 async function updateEventInfo(eventId, newInfo) {
 	console.log('[updateEventInfo] (service)');
 	try {
-		const updatedInfo = { ...newInfo, updatedAt:  new Date(Date.now()) };
+		const updatedInfo = { ...newInfo, updatedAt:  new Date() };
 		await eventModel.updateEvent(eventId, updatedInfo);
 		return;
 

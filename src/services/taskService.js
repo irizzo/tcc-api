@@ -7,8 +7,8 @@ async function createNewTask(userId, newTaskInfo) {
 		const taskInfo = { 
 			...newTaskInfo, 
 			statusCode: 'NOT_STARTED', 
-			createdAt: new Date(Date.now()),
-			updatedAt: new Date(Date.now()),
+			createdAt: new Date(),
+			updatedAt: new Date(),
 			userId
 		};
 
@@ -35,10 +35,7 @@ async function getUserTasks(userId) {
 			return [];
 		}
 
-		// return tasksList;
-
-		const formattedTaskList = formatDatesInArray(tasksList);
-		return formattedTaskList;
+		return formatDatesInArray(tasksList);
 		
 	} catch (error) {
 		throw error;
@@ -56,9 +53,9 @@ async function getUserTaskById(taskId) {
 			return false
 		}
 
-		if(match.schedueledDAte) {
-			console.log('[getUserTaskById] match.schedueledDAte: ', match.schedueledDAte);
-			match.schedueledDAte = convertStampToDate(match.schedueledDAte)
+		if(match.schedueledDate) {
+			console.log('[getUserTaskById] match.schedueledDate: ', match.schedueledDate);
+			match.schedueledDate = convertStampToDate(match.schedueledDate)
 		}
 
 		if (match.dueDate) {
@@ -76,7 +73,7 @@ async function getUserTaskById(taskId) {
 async function updateTaskInfo(taskId, newInfo) {
 	console.log('[updateTaskInfo] (service)');
 	try {
-		const updatedInfo = { ...newInfo, updatedAt: new Date(Date.now()) };
+		const updatedInfo = { ...newInfo, updatedAt: new Date() };
 		await taskModel.updateTask(taskId, updatedInfo);
 		return;
 
