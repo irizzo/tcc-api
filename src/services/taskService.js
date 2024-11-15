@@ -26,16 +26,13 @@ async function getUserTasks(userId) {
 	try {
 		const tasksList = await taskModel.getUserTasks(userId);
 
-		console.log('[getUserTaskById] tasksList: ', tasksList);
-
-
 		if (!tasksList || tasksList.length === 0) {
 			console.log('taskList vazia');
 
 			return [];
 		}
 
-		return formatDatesInArray(tasksList);
+		return tasksList;
 		
 	} catch (error) {
 		throw error;
@@ -51,16 +48,6 @@ async function getUserTaskById(taskId) {
 
 		if(!match) {
 			return false
-		}
-
-		if(match.schedueledDate) {
-			console.log('[getUserTaskById] match.schedueledDate: ', match.schedueledDate);
-			match.schedueledDate = convertStampToDate(match.schedueledDate)
-		}
-
-		if (match.dueDate) {
-			console.log('[getUserTaskById] match.dueDate: ', match.dueDate);
-			match.dueDate = convertStampToDate(match.dueDate)
 		}
 		
 		return match;

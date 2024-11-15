@@ -28,8 +28,7 @@ async function getUserEvents(userId) {
 			return [];
 		}
 		
-		return formatEventDates(eventsList);
-
+		return eventsList;
 	} catch (error) {
 		throw error;
 	}
@@ -43,15 +42,7 @@ async function getUserEventById(eventId) {
 		if (!match) {
 			return false
 		}
-
-		if (match.startDate) {
-			match.startDate = convertStampToDate(match.startDate)
-		}
-
-		if (match.endDate) {
-			match.endDate = convertStampToDate(match.endDate)
-		}
-
+		
 		return match;
 
 	} catch (error) {
