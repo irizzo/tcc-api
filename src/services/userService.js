@@ -67,6 +67,7 @@ exports.deleteUserService = async (userId) => {
 	console.log('[deleteUserService]');
 
 	try {
+		await userModel.deleteUserSubCollections(userId);
 		return await userModel.deleteDbUser(userId);
 		
 	} catch (error) {

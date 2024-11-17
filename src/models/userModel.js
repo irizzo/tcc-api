@@ -72,6 +72,19 @@ async function updateDbUser(userId, updatedInfo) {
 	return;
 }
 
+async function deleteUserSubCollections (userId) {
+	console.log('[listSubCollections] (model)')
+	const userRef = usersCollectionRef.doc(userId)
+	const collections = await userRef.listCollections()
+
+	collections.length > 0 && collections.forEach(async (collection) => {
+		const snapshot = await collection.get()
+		snapshot.docs.length > 0 && snapshot.docs.forEach(async (doc) => doc.ref.delete())
+	})
+
+	return
+}
+
 async function deleteDbUser(userId) {
 	console.log('[deleteUser] (model)');
 	const userRef = usersCollectionRef.doc(userId);
@@ -85,5 +98,6 @@ module.exports = {
 	findUserByEmail,
 	findUserById,
 	updateDbUser,
+	deleteUserSubCollections,
 	deleteDbUser
 };
