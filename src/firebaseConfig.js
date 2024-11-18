@@ -1,6 +1,7 @@
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 
+// const serviceAccount = require('./personal-organizer_firebaseCredentials.json');
 const serviceAccount = {
 	type: process.env.FBSERV_TYPE ,
 	project_id: process.env.FBSERV_PROJECT_ID ,
@@ -14,6 +15,8 @@ const serviceAccount = {
 	client_x509_cert_url: process.env.FBSERV_CLIENT_CERT ,
 	universe_domain: process.env.FBSERV_UNIV_DOMAIN
 }
+
+console.log('firebaseConfig serviceAccount: ', serviceAccount)
 
 initializeApp({
 	credential: cert(serviceAccount)
