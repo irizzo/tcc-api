@@ -1,5 +1,13 @@
 {
 	"version": 2,
+	"projectSettings": {
+		"buildCommand": null,
+		"devCommand": null,
+		"framework": null,
+		"commandForIgnoringBuildStep": "",
+		"installCommand": null,
+		"outputDirectory": null
+	},
 	"builds": [
 		{
 			"src": "server.js",
