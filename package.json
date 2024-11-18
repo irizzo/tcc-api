@@ -1,11 +1,12 @@
 {
-  "name": "rizzo-api",
+  "name": "lyfesync-api",
   "version": "1.0.0",
   "description": "Isabelle Rizzo's api for her TCC",
   "main": "server.js",
   "scripts": {
     "test": "nodemon test.js",
-    "server": "nodemon ./src/api/server.js"
+    "server": "nodemon ./src/api/server.js",
+    "build": ""
   },
   "author": "",
   "license": "ISC",

@@ -26,6 +26,8 @@ app.use(cookieParser());
 
 require('./src/routes')(app);
 
+app.get("/", (req, res) => res.send("Express on Vercel"));
+
 app.use(ErrorHandler)
 
 app.listen(_PORT, () => {

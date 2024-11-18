@@ -4,3 +4,4 @@ src/personal-organizer_firebaseCredentials.json
 src/models/bdMock/
 test.js
 src/routes/test.routes.js
+.vercel
