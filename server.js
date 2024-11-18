@@ -14,7 +14,7 @@ const ErrorHandler = require('./src/middlewares/errorHandler');
 const app = express();
 
 const corsOptions = {
-	origin: _DOMAIN,
+	// origin: _DOMAIN,
 	// credentials: true
 }
 
