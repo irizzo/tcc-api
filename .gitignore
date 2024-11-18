@@ -5,3 +5,4 @@ src/models/bdMock/
 test.js
 src/routes/test.routes.js
 .vercel
+.env*.local

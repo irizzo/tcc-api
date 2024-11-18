@@ -16,8 +16,6 @@ const serviceAccount = {
 	universe_domain: process.env.FBSERV_UNIV_DOMAIN
 }
 
-console.log('firebaseConfig serviceAccount: ', serviceAccount)
-
 initializeApp({
 	credential: cert(serviceAccount)
 });
